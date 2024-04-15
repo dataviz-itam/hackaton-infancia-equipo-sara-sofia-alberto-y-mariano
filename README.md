@@ -29,3 +29,6 @@ Considera los siguientes elementos para la evaluación del proyecto dentro del c
 ---
 **DATOS**
 https://datamx.io/dataset/infancia-cuenta-en-mexico-2023/resource/674ffd48-f086-4468-ad05-fb94c9e1c63b
+
+**CONTACTO**
+Fernando Salas: indicadores@derechosinfancia.org.mx
