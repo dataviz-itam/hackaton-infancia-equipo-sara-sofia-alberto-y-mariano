@@ -1,6 +1,4 @@
-Aquí tienes el texto formateado en Markdown:
 
----
 
 **Participación en el 3er Hackatón por los Derechos de la Niñez y la Adolescencia en México, 2024**  
 Organizado por la Red por los Derechos de la Infancia en México, es parte de las actividades obligatorias y para la evaluación del curso.
