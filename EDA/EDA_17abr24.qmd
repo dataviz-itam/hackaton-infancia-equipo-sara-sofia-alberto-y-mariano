@@ -1,0 +1,342 @@
+---
+title: "EDA_17-abr-24"
+format: pdf
+editor: visual
+---
+
+# Primera Revisada de Datos
+
+## Previo
+
+### Bibliotecas
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(lubridate)
+library(janitor)
+library(ggplot2)
+```
+
+
+### Carga de Datos
+
+```{r}
+raw_data <- read.csv("../Datos/icm-00-23.csv")
+glimpse(raw_data)
+```
+
+# Revisión general
+## Revisamos años
+
+```{r}
+unique(raw_data$Año)
+```
+```{r}
+raw_data %>% filter(Año=="1.CIFRA SIN AÑO DE REFERENCIA")
+```
+
+Filtramos estos datos
+
+**Igual hay que preguntar que onda con estos datos**
+
+
+```{r}
+raw_data_1 <- raw_data %>% filter(Año!="1.CIFRA SIN AÑO DE REFERENCIA") %>% 
+  mutate(Año=as.integer(Año)) %>% 
+  arrange(Año)
+unique(raw_data_1$Año)
+```
+
+## Revisar Estados
+
+```{r}
+unique(raw_data_1$Entidad)
+```
+
+## Revisar Género
+
+```{r}
+unique(raw_data_1$Sexo)
+```
+
+### Revisamos viviendas
+
+Separar viviendas a otra tabla
+
+```{r}
+raw_viviendas <- raw_data_1 %>% filter(Sexo=="Viviendas particulares habitadas")
+raw_data_2 <- raw_data_1 %>% filter(Sexo!="Viviendas particulares habitadas")
+glimpse(raw_viviendas)
+unique(raw_viviendas$Año)          #  Sólo hay tres años
+unique(raw_viviendas$Entidad)      # Todos los estados y a nivel Nacional
+unique(raw_viviendas$Sexo)         # Quitar
+unique(raw_viviendas$Edad)         # Quitar
+unique(raw_viviendas$Tasa)         # Quitar
+unique(raw_viviendas$Población)    # Son 6 categorías
+```
+
+Revisamos cómo es el cálculo de porcentaje:
+
+```{r}
+raw_viviendas %>% select(Año, Entidad, Población, Cantidad, Totales, Porcentaje) %>% 
+  mutate(revision = round(Porcentaje - Cantidad/Totales,3)) %>% 
+  filter(revision!=0)
+```
+
+Revisamos el total de viviendas:
+
+```{r}
+raw_viviendas %>% filter(Entidad!="NACIONAL") %>% 
+  group_by(Población) %>% 
+  summarise(tot = sum(Totales))
+
+raw_viviendas %>% filter(Entidad=="NACIONAL") %>% 
+  group_by(Población) %>% 
+  summarise(tot = sum(Totales))
+```
+
+Revisamos los datos de Internet
+
+```{r}
+raw_viviendas %>% filter(Población=="No disponen de Internet")  %>% 
+  group_by(Año) %>% 
+  summarise(tot = sum(Totales))
+```
+
+No hay año 2000 en Internet
+
+
+Hacemos los cambios mencionados:
+
+```{r}
+raw_viviendas_1 <- raw_viviendas %>% select(Año, Entidad, Población, Cantidad, Totales) %>% 
+  mutate(Porcentaje = Cantidad/Totales)
+glimpse(raw_viviendas_1)
+```
+
+# Revisamos Población
+
+```{r}
+unique(raw_data_2$Población)
+```
+
+# Clasificación
+
+Vamos a ir filtrando por tema
+
+## Educación
+
+```{r}
+raw_educacion <- raw_data_2 %>% filter(Población == "Población que no asiste a la escuela" | 
+                      Población == "Población indígena que no asiste a la escuela" | 
+                      Población == "Abandono escolar (primaria)" |
+                      Población == "Abandono escolar (secundaria)" |
+                      Población == "Inasistencia escolar" |
+                      Población == "Rezago educativo (hasta 2018)" |   
+                      Población == "Abandono escolar (media superior)" |
+                      Población == "Población con condición mental que no asiste a la escuela" |
+                      Población == "Rezago educativo (no indígena)" |
+                      Población == "Rezago educativo (indígena)" |
+                      Población == "Rezago educativo" |
+                      Población != "Población afrodescendiente que no asiste a la escuela"
+                      )
+
+raw_data_3 <- raw_data_2 %>% filter(Población != "Población que no asiste a la escuela" & 
+                      Población != "Población indígena que no asiste a la escuela" &
+                      Población != "Abandono escolar (primaria)" &
+                      Población != "Abandono escolar (secundaria)" &
+                      Población != "Inasistencia escolar" &
+                      Población != "Rezago educativo (hasta 2018)" &
+                      Población != "Abandono escolar (media superior)" &
+                      Población != "Población con condición mental que no asiste a la escuela" &
+                      Población != "Rezago educativo (no indígena)" &
+                      Población != "Rezago educativo (indígena)" &
+                      Población != "Rezago educativo" &
+                      Población != "Población afrodescendiente que no asiste a la escuela"  
+                      )
+```
+
+## Salud
+
+**Acá también entra seguridad social??**
+
+```{r}
+raw_salud <- raw_data_3 %>% filter(Población == "Población sin afiliación a servicio de salud" | 
+                      Población == "Población indígena sin afiliación a servicio de salud" | 
+                      Población == "Carencia por acceso a servicios de salud (hasta 2018)" |
+                      Población == "Población con condición mental sin afiliación a servicio de salud" |
+                      Población == "Carencia por acceso a servicios de salud (no indígena)" |
+                      Población == "Carencia por acceso a servicios de salud (indígena)" |   
+                      Población == "Carencia por acceso a servicios de salud" |
+                      Población == "Población afrodescendiente sin afiliación a servicio de salud" |
+                      Población == "Carencia por acceso a la seguridad social (no indígena)" |
+                      Población == "Carencia por acceso a la seguridad social (indígena)" |
+                      Población == "Carencia por acceso a la seguridad social"
+                      )
+
+raw_data_4 <- raw_data_3 %>% filter(Población != "Población sin afiliación a servicio de salud" &
+                      Población != "Población indígena sin afiliación a servicio de salud" &
+                      Población != "Carencia por acceso a servicios de salud (hasta 2018)" &
+                      Población != "Población con condición mental sin afiliación a servicio de salud" &
+                      Población != "Carencia por acceso a servicios de salud (no indígena)" &
+                      Población != "Carencia por acceso a servicios de salud (indígena)" &
+                      Población != "Carencia por acceso a servicios de salud" &
+                      Población != "Población afrodescendiente sin afiliación a servicio de salud" &
+                      Población != "Carencia por acceso a la seguridad social (no indígena)" &
+                      Población != "Carencia por acceso a la seguridad social (indígena)" &
+                      Población != "Carencia por acceso a la seguridad social"
+                      )
+```
+
+
+## Vivienda
+
+```{r}
+raw_vivienda <- raw_data_4 %>% filter(Población == "Carencia por calidad y espacios de la vivienda (hasta 2018)" | 
+                      Población == "Carencia por servicios básicos de la vivienda (hasta 2018)" | 
+                      Población == "Carencia por calidad y espacios de la vivienda (no indígena)" |
+                      Población == "Carencia por calidad y espacios de la vivienda (indígena)" |
+                      Población == "Carencia por servicios básicos de la vivienda (no indígena)" |
+                      Población == "Carencia por servicios básicos de la vivienda (indígena)" |   
+                      Población == "Carencia por calidad y espacios de la vivienda" |
+                      Población == "Carencia por servicios básicos de la vivienda"
+                      )
+
+raw_data_5 <- raw_data_4 %>% filter(Población != "Carencia por calidad y espacios de la vivienda (hasta 2018)" &
+                      Población != "Carencia por servicios básicos de la vivienda (hasta 2018)" &
+                      Población != "Carencia por calidad y espacios de la vivienda (no indígena)" &
+                      Población != "Carencia por calidad y espacios de la vivienda (indígena)" &
+                      Población != "Carencia por servicios básicos de la vivienda (no indígena)" &
+                      Población != "Carencia por servicios básicos de la vivienda (indígena)" &
+                      Población != "Carencia por calidad y espacios de la vivienda" &
+                      Población != "Carencia por servicios básicos de la vivienda"
+                      )
+```
+
+
+## Alimentación
+
+```{r}
+raw_alimentacion <- raw_data_5 %>% filter(Población == "Carencia por acceso a la alimentación (hasta 2018)" | 
+                      Población == "Inseguridad alimentaria" | 
+                      Población == "Carencia por acceso a la alimentación nutritiva y de calidad (no indígena)" |
+                      Población == "Carencia por acceso a la alimentación nutritiva y de calidad (indígena)" |
+                      Población == "Carencia por acceso a la alimentación nutritiva y de calidad" 
+                      )
+
+raw_data_6 <- raw_data_5 %>% filter(Población != "Carencia por acceso a la alimentación (hasta 2018)" &
+                      Población != "Inseguridad alimentaria" &
+                      Población != "Carencia por acceso a la alimentación nutritiva y de calidad (no indígena)" &
+                      Población != "Carencia por acceso a la alimentación nutritiva y de calidad (indígena)" &
+                      Población != "Carencia por acceso a la alimentación nutritiva y de calidad" 
+                      )
+
+```
+
+## Pobreza
+
+```{r}
+raw_pobreza <- raw_data_6 %>% filter(Población == "Población en pobreza (hasta 2018)" | 
+                      Población == "Población en pobreza extrema (hasta 2018)" | 
+                      Población == "Población no indígena en pobreza" |
+                      Población == "Población indígena en pobreza" |
+                      Población == "Población no indígena en pobreza extrema" |
+                      Población == "Población indígena en pobreza extrema" |
+                      Población == "Población en pobreza" |
+                      Población == "Población en pobreza extrema" 
+                      )
+
+raw_data_7 <- raw_data_6 %>% filter(Población != "Población en pobreza (hasta 2018)" &
+                      Población != "Población en pobreza extrema (hasta 2018)" &
+                      Población != "Población no indígena en pobreza" &
+                      Población != "Población indígena en pobreza" &
+                      Población != "Población no indígena en pobreza extrema" &
+                      Población != "Población indígena en pobreza extrema" &
+                      Población != "Población en pobreza" &
+                      Población != "Población en pobreza extrema" 
+                      )
+```
+
+
+## Violencia
+
+**Es correcto poner suicidio aquí??**
+**Desaparecidos y no localizados???**
+
+```{r}
+raw_violencia <- raw_data_7 %>% filter(Población == "Defunciones por agresiones" | 
+                      Población == "Tasa de mortalidad infantil" | 
+                      Población == "Víctimas de feminicidio" |
+                      Población == "Defunciones por suicidio" |
+                      Población == "Personas desaparecidas y no localizadas"
+                      )
+
+raw_data_8 <- raw_data_7 %>% filter(Población != "Defunciones por agresiones" &
+                      Población != "Tasa de mortalidad infantil" &
+                      Población != "Víctimas de feminicidio" &
+                      Población != "Defunciones por suicidio" &
+                      Población != "Personas desaparecidas y no localizadas"
+                      )
+```
+
+
+## Madres adolescentes o Matrimonio Infantil
+
+```{r}
+raw_m_infantil <- raw_data_8 %>% filter(Población == "Población casada o en unión libre" | 
+                      Población == "Nacimientos de madres" | 
+                      Población == "Población indígena casada o en unión libre" |
+                      Población == "Población con condición mental casada o en unión libre" |
+                      Población == "Población afrodescendiente casada o en unión libre" |
+                      Población == "Población con hijos" |
+                      Población == "Población indígena con hijos" |
+                      Población == "Población con condición mental con hijos" |
+                      Población == "Población afrodescendiente con hijos"
+                      )
+
+raw_data_9 <- raw_data_8 %>% filter(Población != "Población casada o en unión libre" &
+                      Población != "Nacimientos de madres" &
+                      Población != "Población indígena casada o en unión libre" &
+                      Población != "Población con condición mental casada o en unión libre" &
+                      Población != "Población afrodescendiente casada o en unión libre" &
+                      Población != "Población con hijos" &
+                      Población != "Población indígena con hijos" &
+                      Población != "Población con condición mental con hijos" &
+                      Población != "Población afrodescendiente con hijos"
+                      )
+```
+
+
+
+## Trabajo Infantil
+
+```{r}
+raw_trabajo <- raw_data_9 %>% filter(Población == "Población ocupada" | 
+                      Población == "Trabajo infantil" 
+                      )
+raw_data_10 <- raw_data_9 %>% filter(Población != "Población ocupada" &
+                      Población != "Trabajo infantil" 
+                      )
+```
+
+
+## Derecho a Nacionalidad
+
+```{r}
+raw_nacionalidad <- raw_data_10 %>% filter(Población == "Repatriaciones desde EUA" | 
+                      Población == "Población con registro" 
+                      )
+raw_data_11 <- raw_data_10 %>% filter(Población != "Repatriaciones desde EUA" &
+                      Población != "Población con registro" 
+                      )
+```
+
+## Interseccionalidad
+
+```{r}
+unique(raw_data_11$Población)
+```
+
+**Qué es "Índice de calidad de leyes" ???**
+**Como afecta "Población que nació fuera de la entidad"???**
