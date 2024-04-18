@@ -193,7 +193,7 @@ raw_data_4 <- raw_data_3 %>% filter(Población != "Población sin afiliación a 
 ## Vivienda
 
 ```{r}
-raw_vivienda <- raw_data_4 %>% filter(Población == "Carencia por calidad y espacios de la vivienda (hasta 2018)" | 
+raw_vivienda_2 <- raw_data_4 %>% filter(Población == "Carencia por calidad y espacios de la vivienda (hasta 2018)" | 
                       Población == "Carencia por servicios básicos de la vivienda (hasta 2018)" | 
                       Población == "Carencia por calidad y espacios de la vivienda (no indígena)" |
                       Población == "Carencia por calidad y espacios de la vivienda (indígena)" |
@@ -340,3 +340,143 @@ unique(raw_data_11$Población)
 
 **Qué es "Índice de calidad de leyes" ???**
 **Como afecta "Población que nació fuera de la entidad"???**
+
+# Revisión de cifras
+
+## raw_viviendas_1
+
+```{r}
+unique(raw_viviendas_1$Población)
+
+ggplot(raw_viviendas_1, aes(x=Año, y = Porcentaje, colour = Entidad))  + 
+  geom_line() +
+  facet_wrap(~Población)
+                     
+```
+
+**Porqué bajan??**
+
+```{r}
+unique(raw_viviendas_1$Población)
+
+raw_viviendas_1 %>%
+  filter(Entidad != "NACIONAL") %>% 
+  ggplot(aes(x=Año, y = Cantidad, colour = Entidad))  + 
+  geom_line() +
+  facet_wrap(~Población)
+```
+
+## raw_vivienda_2
+
+```{r}
+glimpse(raw_vivienda_2)
+unique(raw_vivienda_2$Año)            # Del 2008-2022 de dos en dos
+unique(raw_vivienda_2$Entidad)        # Completo con Nacional
+unique(raw_vivienda_2$Edad)           # Intervalos de 3-17 y 0-17 años usarlos para comprobar cantidades
+#unique(raw_vivienda_2$Cantidad)       # Algunos NA, investigar donde no hay de: cantidad, totales y porcentaje
+```
+
+Vamos a ver dónde están los NA
+
+```{r}
+raw_vivienda_2 %>% filter(is.na(Cantidad)) %>% {unique(.$Población)}
+```
+
+**Estas cantidades son la suma hasta 2018?**
+
+Limpiamos la parte que no es hasta 2018:
+
+```{r}
+raw_vivienda_3 <- raw_vivienda_2 %>% filter(Población!="Carencia por calidad y espacios de la vivienda (hasta 2018)" &
+                          Población!="Carencia por servicios básicos de la vivienda (hasta 2018)") 
+glimpse(raw_vivienda_3)
+unique(raw_vivienda_3$Totales)  # Borrar
+unique(raw_vivienda_3$Tasa)     # Borrar 
+unique(raw_vivienda_3$Edad)     #Ojo solo de 3-17 y 0-17
+unique(raw_vivienda_3$Sexo)     # Hombre Mujer y Total
+unique(raw_vivienda_3$Entidad)  # Todos los estados y Nacional
+unique(raw_vivienda_3$Año)      # 2016, 2018, 2020, 2022
+
+raw_vivienda_4 <- raw_vivienda_3 %>% select(Año, Entidad, Población, Sexo, Edad, Cantidad, Porcentaje)
+```
+
+limpiamos la parte hasta 2018
+
+```{r}
+raw_vivienda_5 <- raw_vivienda_2 %>% filter(Población=="Carencia por calidad y espacios de la vivienda (hasta 2018)" |
+                          Población=="Carencia por servicios básicos de la vivienda (hasta 2018)") 
+glimpse(raw_vivienda_5)
+unique(raw_vivienda_5$Totales)      # Borrar
+unique(raw_vivienda_5$Tasa)         # Borrar
+unique(raw_vivienda_5$Cantidad)     # Borrar
+unique(raw_vivienda_5$Edad)         # "0 a 17 años"  "0 a 1 años"   "2 a 5 años"   "6 a 11 años"  "12 a 17 años"
+unique(raw_vivienda_5$Sexo)         # Hombre Mujer y Total
+unique(raw_vivienda_5$Entidad)      # Todos los estados y Nacional
+unique(raw_vivienda_5$Año)          # 2008 2010 2012 2014 2016 2018
+
+raw_vivienda_6 <- raw_vivienda_5 %>% select(Año, Entidad, Población, Sexo, Edad, Porcentaje)
+```
+
+Como se comparan estos dos?
+
+```{r}
+raw_vivienda_4 %>% filter(Año==2016 | Año==2018) %>% 
+  filter(Edad=="0 a 17 años") %>% 
+  group_by(Población) %>% 
+  summarise(sum_p=sum(Porcentaje))
+```
+
+```{r}
+raw_vivienda_6 %>% filter(Año==2016 | Año==2018) %>% 
+  filter(Edad=="0 a 17 años") %>% 
+  group_by(Población) %>% 
+  summarise(sum_p=sum(Porcentaje))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
