@@ -18,20 +18,21 @@ library(janitor)
 library(ggplot2)
 ```
 
-
 ### Carga de Datos
 
 ```{r}
-raw_data <- read.csv("../Datos/icm-00-23.csv")
+raw_data <- read.csv("../data/icm-00-23.csv")
 glimpse(raw_data)
 ```
 
 # Revisión general
+
 ## Revisamos años
 
 ```{r}
 unique(raw_data$Año)
 ```
+
 ```{r}
 raw_data %>% filter(Año=="1.CIFRA SIN AÑO DE REFERENCIA")
 ```
@@ -39,7 +40,6 @@ raw_data %>% filter(Año=="1.CIFRA SIN AÑO DE REFERENCIA")
 Filtramos estos datos
 
 **Igual hay que preguntar que onda con estos datos**
-
 
 ```{r}
 raw_data_1 <- raw_data %>% filter(Año!="1.CIFRA SIN AÑO DE REFERENCIA") %>% 
@@ -106,7 +106,6 @@ raw_viviendas %>% filter(Población=="No disponen de Internet")  %>%
 
 No hay año 2000 en Internet
 
-
 Hacemos los cambios mencionados:
 
 ```{r}
@@ -126,6 +125,9 @@ unique(raw_data_2$Población)
 Vamos a ir filtrando por tema
 
 ## Educación
+
+```{r}
+```
 
 ```{r}
 raw_educacion <- raw_data_2 %>% filter(Población == "Población que no asiste a la escuela" | 
@@ -155,6 +157,9 @@ raw_data_3 <- raw_data_2 %>% filter(Población != "Población que no asiste a la
                       Población != "Rezago educativo" &
                       Población != "Población afrodescendiente que no asiste a la escuela"  
                       )
+```
+
+```{r}
 ```
 
 ## Salud
@@ -189,7 +194,6 @@ raw_data_4 <- raw_data_3 %>% filter(Población != "Población sin afiliación a 
                       )
 ```
 
-
 ## Vivienda
 
 ```{r}
@@ -213,7 +217,6 @@ raw_data_5 <- raw_data_4 %>% filter(Población != "Carencia por calidad y espaci
                       Población != "Carencia por servicios básicos de la vivienda"
                       )
 ```
-
 
 ## Alimentación
 
@@ -258,11 +261,9 @@ raw_data_7 <- raw_data_6 %>% filter(Población != "Población en pobreza (hasta 
                       )
 ```
 
-
 ## Violencia
 
-**Es correcto poner suicidio aquí??**
-**Desaparecidos y no localizados???**
+**Es correcto poner suicidio aquí??** **Desaparecidos y no localizados???**
 
 ```{r}
 raw_violencia <- raw_data_7 %>% filter(Población == "Defunciones por agresiones" | 
@@ -279,7 +280,6 @@ raw_data_8 <- raw_data_7 %>% filter(Población != "Defunciones por agresiones" &
                       Población != "Personas desaparecidas y no localizadas"
                       )
 ```
-
 
 ## Madres adolescentes o Matrimonio Infantil
 
@@ -307,8 +307,6 @@ raw_data_9 <- raw_data_8 %>% filter(Población != "Población casada o en unión
                       )
 ```
 
-
-
 ## Trabajo Infantil
 
 ```{r}
@@ -319,7 +317,6 @@ raw_data_10 <- raw_data_9 %>% filter(Población != "Población ocupada" &
                       Población != "Trabajo infantil" 
                       )
 ```
-
 
 ## Derecho a Nacionalidad
 
@@ -338,8 +335,7 @@ raw_data_11 <- raw_data_10 %>% filter(Población != "Repatriaciones desde EUA" &
 unique(raw_data_11$Población)
 ```
 
-**Qué es "Índice de calidad de leyes" ???**
-**Como afecta "Población que nació fuera de la entidad"???**
+**Qué es "Índice de calidad de leyes" ???** **Como afecta "Población que nació fuera de la entidad"???**
 
 # Revisión de cifras
 
@@ -433,45 +429,153 @@ raw_vivienda_6 %>% filter(Año==2016 | Año==2018) %>%
   summarise(sum_p=sum(Porcentaje))
 ```
 
+# Propuestas Sara
+
+## Matrimonio e Hijos
+
+```{r}
+unique(raw_data_2$Población)
+```
+
+```{r}
+datos_1 <-raw_data_2 %>% 
+  filter(
+          Población == "Población afrodescendiente"  | 
+          Población == "Población afrodescendiente que no asiste a la escuela"  | 
+          Población == "Población afrodescendiente con hijos" |
+          Población == "Población afrodescendiente sin afiliación a servicio de salud"  |
+          Población == "Población afrodescendiente casada o en unión libre" |
+          Población == "Población afrodescendiente con condición mental" |   
+                        
+          Población == "Población hablante de lengua indígena" |
+          Población == "Población indígena que no asiste a la escuela" |
+          Población == "Población indígena con hijos" |
+          Población == "Población indígena sin afiliación a servicio de salud" |
+          Población == "Población indígena casada o en unión libre" |
+          Población == "Población indígena con condición mental" |
+                      
+          Población == "Población con condición mental" |
+          Población == "Población con condición mental que no asiste a la escuela" |
+          Población == "Población con condición mental con hijos" |
+          Población == "Población con condición mental sin afiliación a servicio de salud" |
+          Población == "Población con condición mental casada o en unión libre"
+          ) %>% 
+  select(Año, Entidad, Población, Sexo, Edad, Cantidad, Totales, Porcentaje)
+
+
+datos_1 <- datos_1 %>% mutate(varios=paste(Población,Edad,Año)) %>% arrange(varios)
+
+unique(datos_1$varios)
+
+```
+
+```{r}
+raw_m_infantil <- raw_data_8 %>% filter(
+                      Población == "Población casada o en unión libre" | 
+                      Población == "Nacimientos de madres" | 
+                      Población == "Población indígena casada o en unión libre" |
+                      Población == "Población con condición mental casada o en unión libre" |
+                      Población == "Población afrodescendiente casada o en unión libre" |
+                      Población == "Población con hijos" |
+                      Población == "Población indígena con hijos" |
+                      Población == "Población con condición mental con hijos" |
+                      Población == "Población afrodescendiente con hijos"#|
+                      # Población == "Población afrodescendiente"  | 
+                      # Población == "Población hablante de lengua indígena" |
+                      # Población == "Población con condición mental" 
+                      )
+
+glimpse(raw_m_infantil)
+
+unique(raw_m_infantil$Tasa)  # Se borra tasa
+unique(raw_m_infantil$Edad)
+unique(raw_m_infantil$Poblacion)
+unique(raw_m_infantil$Año)
+
+raw_m_infantil <- raw_m_infantil %>% select(Año, Entidad, Población, Sexo, Edad, Cantidad, Totales, Porcentaje)
+
+raw_m_infantil %>% filter(Población=="Población casada o en unión libre")
+
+```
+
+```{r}
+pob_casada <- raw_m_infantil %>% 
+  filter(Población=="Población casada o en unión libre") %>% 
+  filter(Sexo != "Total") %>% 
+  filter(Edad=="12 a 17 años") %>% 
+  filter(Entidad=="NACIONAL")
+
+pob_casada
+
+library(scales)
+
+ggplot(pob_casada, aes(x = Año, y = Cantidad, fill = Sexo)) +
+  geom_bar(stat = "identity") +
+  ggtitle(str_wrap("Comparación entre Hombre y Mujeres Adolescentes (12-17 Años), casados o en unión libre a nivel nacional", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)  # Use comma formatting for y-axis labels
+```
+
+
+
+```{r}
+raw_m_infantil %>%
+  filter(Población == "Población casada o en unión libre" |
+         Población == "Población afrodescendiente casada o en unión libre" |
+         Población == "Población indígena casada o en unión libre" |
+         Población == "Población con condición mental casada o en unión libre"
+  ) %>%
+  mutate(Población = ifelse(Población == "Población casada o en unión libre", "Población en general", Población)) %>%
+  mutate(Población = ifelse(Población == "Población afrodescendiente casada o en unión libre", "Afrodescendiente", Población)) %>%
+  mutate(Población = ifelse(Población == "Población indígena casada o en unión libre", "Indígena", Población)) %>%
+  mutate(Población = ifelse(Población == "Población con condición mental casada o en unión libre", "con condición mental", Población)) %>%
+  mutate(Porcentaje=Porcentaje*100) %>% 
+  filter(Sexo == "Total") %>%
+  filter(Año == 2020) %>%
+  filter(Entidad == "NACIONAL") %>%
+  ggplot(aes(x = Población, y = Porcentaje, fill = Edad)) +
+  geom_bar(stat = "identity") +
+  ggtitle(str_wrap("Porcentaje de las adolescentes de poblaciones vulnerables que están casadas o en unión libre a nivel nacional (2020)", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma) 
+```
+
+
+```{r}
+raw_m_infantil %>%
+  filter(Población == "Población con hijos" |
+         Población == "Población afrodescendiente con hijos" |
+         Población == "Población indígena con hijos" |
+         Población == "Población con condición mental con hijos"
+  ) %>%
+  mutate(Población = ifelse(Población == "Población con hijos", "Población en general", Población)) %>%
+  mutate(Población = ifelse(Población == "Población afrodescendiente con hijos", "Afrodescendiente", Población)) %>%
+  mutate(Población = ifelse(Población == "Población indígena con hijos", "Indígena", Población)) %>%
+  mutate(Población = ifelse(Población == "Población con condición mental con hijos", "con condición mental", Población)) %>%
+  mutate(Porcentaje=Porcentaje*100) %>% 
+  filter(Sexo == "Mujer") %>% ###################################### OJO SOLO CUENTAN A LAS MUJERES
+  filter(Año == 2020) %>%
+  filter(Entidad == "NACIONAL") %>%
+  ggplot(aes(x = Población, y = Porcentaje, fill = Edad)) +
+  geom_bar(stat = "identity") +
+  ggtitle(str_wrap("Porcentaje de mujeres adolescentes de poblaciones vulnerables que tienen hijos nivel nacional (2020)", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma) 
+```
+```{r}
+raw_m_infantil %>%
+  filter(Población == "Nacimientos de madres") %>% 
+  ggplot(aes(x = Año, y = Cantidad, fill = Edad)) +
+  geom_bar(stat = "identity") +
+  ggtitle(str_wrap("Cantidad de Nacimientos de madres???, por año", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)
+```
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+## Escuela
 
 
 
