@@ -573,14 +573,61 @@ raw_m_infantil %>%
 ```
 
 
-
-
 ## Escuela
 
+```{r}
+raw_data_2 %>% 
+  filter(
+          Población == "Población afrodescendiente que no asiste a la escuela"  | 
+          Población == "Población indígena que no asiste a la escuela" |
+          Población == "Población con condición mental que no asiste a la escuela" |
+          Población == "Población que no asiste a la escuela"
+          ) %>% 
+  mutate(Población = ifelse(Población == "Población afrodescendiente que no asiste a la escuela", "Afro", Población)) %>%
+    mutate(Población = ifelse(Población == "Población indígena que no asiste a la escuela", "Indgn", Población)) %>%
+    mutate(Población = ifelse(Población == "Población con condición mental que no asiste a la escuela", "cm", Población)) %>%
+    mutate(Población = ifelse(Población == "Población que no asiste a la escuela", "PG", Población)) %>%
+    mutate(Porcentaje=Porcentaje*100) %>% 
+  filter(Sexo!="Total") %>% 
+  filter(Entidad=="NACIONAL") %>% 
+  ggplot(aes(fill=Edad, y=Porcentaje, x=Población)) + 
+    geom_bar(position="dodge", stat="identity")+
+  facet_wrap(~Año)+
+  ggtitle(str_wrap("Porcentaje niños y adolescentes (afrodescendientes, con condición mental, indígenas y población en general), que no asiste a la escuela", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)
+```
+
+**Aquí me molesta que no haya esta estadística para discapacidad**
+**Hay otras categorias de abandono escolar**
 
 
+## Servicio de Salud
 
+```{r}
+raw_data_2 %>% 
+  filter(
+          Población == "Población afrodescendiente sin afiliación a servicio de salud"  | 
+          Población == "Población indígena sin afiliación a servicio de salud" |
+          Población == "Población con condición mental sin afiliación a servicio de salud" |
+          Población == "Población sin afiliación a servicio de salud"
+          ) %>% 
+  mutate(Población = ifelse(Población == "Población afrodescendiente sin afiliación a servicio de salud", "Afro", Población)) %>%
+    mutate(Población = ifelse(Población == "Población indígena sin afiliación a servicio de salud", "Indgn", Población)) %>%
+    mutate(Población = ifelse(Población == "Población con condición mental sin afiliación a servicio de salud", "cm", Población)) %>%
+    mutate(Población = ifelse(Población == "Población sin afiliación a servicio de salud", "PG", Población)) %>%
+    mutate(Porcentaje=Porcentaje*100) %>% 
+  filter(Sexo!="Total") %>% 
+  filter(Entidad=="NACIONAL") %>% 
+  ggplot(aes(fill=Edad, y=Porcentaje, x=Población)) + 
+    geom_bar(position="dodge", stat="identity")+
+  facet_wrap(~Año)+
+  ggtitle(str_wrap("Porcentaje niños y adolescentes (afrodescendientes, con condición mental, indígenas y población en general), sin afiliación al servicio de salud", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)
+```
 
+**Hay otras categorias de carenica de servicios de salud y seguridad social**
 
 
 
