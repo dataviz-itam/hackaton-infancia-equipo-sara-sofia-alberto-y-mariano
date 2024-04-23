@@ -1,5 +1,4 @@
 
-
 # Cargar paquetes
 library(dplyr)
 library(ggplot2)
