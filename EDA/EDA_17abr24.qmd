@@ -520,12 +520,12 @@ patterns <- c("stripe", "solid")  # Add hash patterns for each color
 ggplot(pob_casada, aes(x = as.factor(Año), y = Cantidad, fill = Sexo)) +
   geom_bar(position="dodge", stat="identity") +
   scale_fill_manual(values = custom_fill_colors, aesthetics = "fill") +
-  ggtitle(str_wrap("Casados o en unión libre", width = 50)) +  # Center the title
+  ggtitle(str_wrap("Matrimonio infantil", width = 50)) +  # Center the title
   theme(
     plot.title = element_text(size = 14, color = "lightgray", hjust = 0.5),  # Set plot title color to lightgray
-    plot.background = element_rect(fill = "transparent"),  # Set plot background color to transparent
-    panel.background = element_rect(fill = "transparent"),  # Set panel background color to transparent
-    legend.background = element_rect(fill = "transparent"),  # Set legend background color to transparent
+    plot.background = element_rect(fill = "#555555"),  # Set plot background color to transparent
+    panel.background = element_rect(fill = "#555555"),  # Set panel background color to transparent
+    legend.background = element_rect(fill = "#555555"),  # Set legend background color to transparent
     axis.text = element_text(color = "lightgray"),  # Set axis text color to lightgray
     axis.title = element_text(color = "lightgray"),  # Set axis title color to lightgray
     axis.line = element_line(color = "lightgray"),  # Set axis line color to lightgray
@@ -1046,9 +1046,9 @@ raw_trabajo %>%
   ggtitle(str_wrap("Trabajo infantil", width = 50)) +  # Center the title
   theme(
     plot.title = element_text(size = 14, color = "lightgray", hjust = 0.5),  # Set plot title color to lightgray
-    plot.background = element_rect(fill = "transparent"),  # Set plot background color to transparent
-    panel.background = element_rect(fill = "transparent"),  # Set panel background color to transparent
-    legend.background = element_rect(fill = "transparent"),  # Set legend background color to transparent
+    plot.background = element_rect(fill = "#555555"),  # Set plot background color to transparent
+    panel.background = element_rect(fill = "#555555"),  # Set panel background color to transparent
+    legend.background = element_rect(fill = "#555555"),  # Set legend background color to transparent
     axis.text = element_text(color = "lightgray"),  # Set axis text color to lightgray
     axis.title = element_text(color = "lightgray"),  # Set axis title color to lightgray
     axis.line = element_line(color = "lightgray"),  # Set axis line color to lightgray
