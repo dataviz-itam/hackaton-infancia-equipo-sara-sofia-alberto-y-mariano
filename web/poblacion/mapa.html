@@ -11,12 +11,12 @@
     <div class="container">
         <h1 id="mapTitle">Población de niños y niñas en México</h1>
         <p id="mapDesc" style="display: none;">Datos recabados por la CONAFOR a partir de 2015 a 2021. El tamaño de las burbujas representa el total de hectareas afectadas; se tiene un rango de afectación general de <span id="minRange">0.005</span> a <span id="maxRange">23,809</span> hectareas</p>
-        <canvas id="myCanvas" style=" position: absolute; bottom: -50px; left: -100px;"></canvas>
+        <canvas id="myCanvas" style=" position: absolute; bottom: 40px; left: -60px;"></canvas>
         <canvas id="canvasRef" style=" position: absolute; bottom: -210px; left: 290px;"></canvas>
-        <canvas id="canvasRep" style=" position: absolute; bottom: -100px; left: 200px;"></canvas>
+        <canvas id="canvasRep" style=" position: absolute; bottom: -10px; left: 250px;"></canvas>
     </div>
     <div class="nav">
-      <a class="navLink" href="/"> Ver datos</a>
+      <!--<a class="navLink" href="/"> Ver datos</a>-->
     </div>
     <input type="range" id="yearSlider" min="2000" max="2020" value="2000" step="5" list="years_">
     <datalist id="years_">
@@ -35,38 +35,17 @@
       <input type="radio" class="Impactcheck" id="indigena" name="categoria" value="indigena">
       <label for="indigena">indigena</label><br>
     </div>
-    <div class="collapsible" style="top: 420px; left: 35px; display: none;">
+    <div class="collapsible" style="top: 400px; left: 35px;">
         <div class="collapsible-header">
           <span>Marco de Referencia</span>
           <img src="resources/img/arrow.png" class="arrow-icon">
         </div>
-        <div class="collapsible-content">
-          <p>
-            <img src="resources/img/cu.png" alt="Ciudad Universitaria">
-              750 hect. aprox. <br> C. Universitaria
-          </p>
-          <p>
-            <img src="resources/img/fundidora.png" alt="Parque fundidora">
-              100 hect. aprox. <br> Parque Fundidora
-          </p>     
-          <p>
-            <img src="resources/img/azteca.png" alt="Estadio Azteca">
-              50 hect. aprox. <br> Estadio Azteca
-          </p>
-          <p>
-            <img src="resources/img/auditorio.png" alt="Auditorio Nacional">
-              10 hect. aprox. <br> Auditorio nacional
-          </p>
-          <p>
-            <img src="resources/img/zocalo.png" alt="Zocalo CDMX">
-              5 hect. aprox. <br> Zócalo, CDMX
-          </p>
-          <p>
-            <img src="resources/img/park.png" alt="Parque españa">
-              1 hectarea aprox.<br> Parque España
-          </p>
-            <canvas id="canvasRefBubbles" style=" z-index: -1;position:absolute; bottom: 0px; left: 260px;"></canvas>
-          </div>          
+        <div class="collapsible-content" style="background-color: rgba(46, 42, 42, 0.9); z-index: -1;">  
+          <p style="height: 420px; ">
+               
+          </p>  
+            <canvas id="canvasRefBubbles" style=" z-index: 10;position:absolute; bottom: 0px; left: 30px;"></canvas>
+        </div>          
     </div>      
     <script src="resources/js/canvas.js"></script>
     <script src="resources/js/data.js"></script>

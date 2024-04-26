@@ -153,8 +153,8 @@ function drawBubbles(ctx,ctxRef,ctxRefB,bbox,datos,color,textColor,yearSelected,
 
 }
 
-function drawBubbleReferences(ctxRefB,scale,minRange,maxRange){
-    let radiosRef = [1,5,10,50,100,750];   
+function drawBubbleReferences(ctxRefB,scale,minRange,maxRange){console.log(maxRange)
+    let radiosRef = [50000,100000,250000,500000,2500000];   
     let yPos = 40
     let yStep = 73;
     let yStepProp = 1;
@@ -168,9 +168,23 @@ function drawBubbleReferences(ctxRefB,scale,minRange,maxRange){
     for(let radio of radiosRef){
         if(radio<=maxRange){
             ctxRefB.beginPath();
-            ctxRefB.arc(40, yPos, scale(radio+1,1), 0, 2 * Math.PI);
-            ctxRefB.fillStyle = "rgba(255, 3, 58, 1)";
+            ctxRefB.arc(50, yPos, scale(radio+1), 0, 2 * Math.PI);
+            ctxRefB.fillStyle = "white";
             ctxRefB.fill();
+
+
+            ctxRefB.save();
+            ctxRefB.scale(1, -1);
+
+            // Escribir el número dentro del círculo
+            ctxRefB.fillStyle = "white"; // Color del texto
+            ctxRefB.font = "bold 12px Arial"; // Fuente y tamaño del texto
+            ctxRefB.textAlign = "center"; // Alineación del texto
+            ctxRefB.textBaseline = "middle"; // Baseline del texto
+            ctxRefB.fillText(radio, 150, -yPos+5); // Escribir el número en el centro del círculo
+
+            ctxRefB.restore();
+            
             yPos += yStep; 
         }
         

@@ -44,7 +44,7 @@ body{
 
 #buttonContainer {
     display: inline-block; /* Alinear el contenedor y la imagen */
-    border-radius: 50%; /* Hacer que el contenedor sea redondo */
+    border-radius: 50%; 
     margin: 1%;
     margin-top: -1%;
     display: block;
