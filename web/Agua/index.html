@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coloreando el agua</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="mainBanner"></div>
+    <div id="intro">
+        <div class="infoGeneral">
+            <div id="buttonContainer">
+                <img id="pressButton" src="images/button.png" alt="Botón" onclick="toggleDisplay()">
+            </div>
+            <h1>Coloreando el agua</h1>
+            <p>
+                Puedes adivinar ¿Cuántos hogares mexicanos cuentan con agua entubada en su interior?.
+            </p>
+            <p>
+                <ol>
+                    <li>Rellena la gota vacía hasta el nivel que creas que representa el porcentaje de hogares que cuenta con este servicio. (Recuerda no salirte de la línea al colorear) </li>
+                    <li>Posteriormente, oprime el botó para descubrir que tan cerca estuviste.</li>
+                </ol>
+            </p>
+        </div>
+    </div>
+    <div class="content">
+        <div id="left">
+            <canvas id="myCanvas" width="600" height="600"></canvas>
+
+            <img src="images/gota_vacia(1).png">
+        </div>
+        <div id="right">
+            <div id="right_text">
+                <p>De acuerdo con el Instituto Nacional de Estadística y Geografía (Inegi), 
+                    de las 35.2 millones de viviendas que hay en México, 8.1 millones (23.1%) no cuentan con agua entubada dentro del hogar.
+                    De acuerdo con el Instituto Nacional de Estadística y Geografía (Inegi), de las 35.2 millones de viviendas que hay en México, 8.1 millones (23.1%) no cuentan con agua entubada dentro del hogar. 
+                    <span id="reference">(Samanta Escobar, El economista, Mar 7, 2023)</span>
+                </div>
+            <img src="images/gota_rellena(1).png">
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+</body>
+</html>
