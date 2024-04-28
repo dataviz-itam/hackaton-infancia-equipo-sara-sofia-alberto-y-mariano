@@ -2,183 +2,76 @@
 <html>
 
 <head>
-    <title>machismo</title>
+    <title>pob indígena</title>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background-color: white;
-            color: black;
-            min-width: 1800px;
-            width: 1800px;
-            overflow-x: visible;
-        }
+    <link rel="stylesheet" type="text/css" href="./css/estilos.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
-        svg {
-            overflow: visible;
-        }
-
-        #leyenda {
-            display: flex;
-            flex-direction: column;
-            margin-top: -10px;
-            position: absolute;
-            left: 81vw;
-            top: 0;
-            padding: 20px;
-        }
-
-        #leyenda .leyenda-item {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-        }
-
-        #leyenda .leyenda-item span {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-        }
-
-        span.hombres-color {
-            background-color: cornflowerblue;
-        }
-
-        span.mujeres-color {
-            background-color: magenta;
-        }
-
-        div.texto {
-            color: black;
-            font-size: 40px;
-        }
-
-        div.texto .hombre {
-            color: cornflowerblue;
-        }
-
-        div.texto .mujer {
-            color: magenta;
-        }
-
-        div.texto-1 {
-            width: 30%;
-            position: relative;
-            top: 20%;
-            left: 25%;
-            text-align: right;
-        }
-
-        div.texto-2 {
-            width: 25%;
-            position: relative;
-            top: 55%;
-            left: 63%;
-            text-align: left;
-        }
-
-        .rect:hover {
-            opacity: 0.5;
-        }
-
-        div#d3-container1 {
-            position: relative;
-            top: 25%;
-            left: -35%;
-        }
-
-        div#d3-container2 {
-            position: absolute;
-            top: 50%;
-            left: 15%;
-        }
-
-        .dropbtn {
-  background-color: #04AA6D;
-  color: white;
-  padding: 16px;
-  font-size: 16px;
-  border: none;
-}
-
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f1f1f1;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
-  top: 10%;
-}
-
-.dropdown-content a {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-}
-
-.dropdown-content a:hover {background-color: #ddd;}
-
-.dropdown:hover .dropdown-content {display: block;}
-
-.dropdown:hover .dropbtn {background-color: #3e8e41;}
-
-    </style>
 </head>
 
 <body>
-    <div style="text-align: center; width:1100px; height:800px; margin: 0 auto;">
-        <h2> <br> Deuda Histórica: La Falta de Oportunidades para los Pueblos Indígenas
+    <div class="bordes-vert izq"></div>
+    <div class="bordes-vert der"></div>
+    <div class="borde-bottom"></div>
+    <div id="title">
+        <h2> <br> Deuda Histórica: La Falta de Oportunidades para los Pueblos Indígenas <br>
         </h2>
-        <div id="d3-container1"></div>
-        <div id="d3-container2" />
-    </div>
-    </div>
-    <!-- <div id="leyenda">
-        <div class="leyenda-item">
-            <span class="hombres-color">
-            </span>
-            <p>hombres</p>
-        </div>
-        <div class="leyenda-item">
-            <span class="mujeres-color">
-            </span>
-            <p>mujeres</p>
-        </div>
-    </div> -->
-    
-    <div class="dropdown">
-        <button class="dropbtn">Dropdown</button>
-        <div class="dropdown-content">
-            <a href="#">Link 1</a>
-            <a href="#">Link 2</a>
-            <a href="#">Link 3</a>
-        </div>
-    </div>
-    
-    
-    
-    <div style="width: 1400px; height:800px; position: absolute; top:0; margin: 0 auto; ">
-    
-        <!-- <div class="texto texto-1">
-            <p>Las niñas juegan con <span class="mujer">muñecas </span>
-                y los niños con <span class="hombre">cochecitos</span></p>
-        </div>
-        <div class="texto texto-2">
-            <p>Las niñas de <span class="mujer">rosa </span>
-                y los niños de <span class="hombre">azul</span> </p>
+        <h4>(datos a nivel nacional de niños y adolescentes de 3 a 17 años) <br></h4>
+        <p>En esta página se muestran comparativos de algunas métricas entre la población indígena y la no indígena, <br>
+            el uso de colores está inspirado en las artesanías mexicanas. <br>
+            Buscamos dar visibilidad a la disparidad de oportunidades 
+            y la deuda de la sociedad mexicana con la población indígena. </p>
+<div class="dropdown">
+    <label for="indicador-select">Elije el indicador: </label>
+    <select id="indicador-select" class="form-select" aria-label="Default select example">
+        <!-- <option selected>Elije el indicador</option> -->
+        <!-- <option value="1">One</option>
+        <option value="2">Two</option>
+        <option value="3">Three</option> -->
+        <option selected value="rezago_educativo"> Rezago educativo </option>
+        <option value="servicio_salud"> Carencia por acceso a servicios de salud </option>
+        <option value="seguridad_social"> Carencia por acceso a la seguridad social </option>
+        <option value="alimentacion_nutritiva"> Carencia por acceso a la alimentación nutritiva y de calidad </option>
+        <option value="pobreza"> Población en situación de pobreza </option>
+        <option value="pobreza_extrema"> Población en situación de pobreza extrema </option>
+        <option value="calidad_vivienda"> Carencia por calidad y espacios de la vivienda </option>
+        <option value="servicios_basicos"> Carencia por servicios básicos de la vivienda </option>
+    </select>
+  
+</div>
+        <!-- <div class="dropdown">
+            <button class="dropbtn">Dropdown</button>
+            <div class="dropdown-content">
+                <a href="#">Rezago educativo</a>
+                <a href="#">Carencia por acceso a servicios de salud</a>
+                <a href="#">Carencia por acceso a la seguridad social</a>
+                <a href="#">Carencia por acceso a la alimentación nutritiva y de calidad</a>
+                <a href="#">Población en situación de pobreza</a>
+                <a href="#">Población en situación de pobreza extrema</a>
+                <a href="#">Carencia por calidad y espacios de la vivienda</a>
+                <a href="#">Carencia por servicios básicos de la vivienda</a>
+            </div>
         </div> -->
     </div>
+    <div class="canvas-container">
+        <div id="d3-container1" class="d3-container"></div>
+        <!-- <div id="d3-container2" class="d3-container"></div> -->
+
+    </div>
+
+
+
+
+
     <script type="text/javascript" src="./js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>
