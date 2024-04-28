@@ -1,3 +1,13 @@
+let indicador="rezago_educativo";
+let texto="Rezago educativo";
+
+document.getElementById("indicador-select").addEventListener("change", (event) => {
+  indicador = (event.target.value);
+  texto = event.target.options[event.target.selectedIndex].text;
+  console.log("Mostrar", indicador, texto);
+  barChart(data, "#d3-container1", indicador, texto);
+});
+
 // DATOS
 
 const data = [
@@ -99,6 +109,17 @@ const data = [
   },
 ];
 
+const colores_textos = {
+    rezago_educativo: "#00B8B2",
+    servicio_salud: "#FFC300",
+    seguridad_social: "#C77CFF",
+    alimentacion_nutritiva: "#D11141",
+    pobreza: "#0CB702",
+    pobreza_extrema: "#f37735",
+    calidad_vivienda: "#ff61cc",
+    servicios_basicos: "#0000FF",
+  };
+
 // Listener
 
 
@@ -109,6 +130,9 @@ const height = 350;
 const margin = { top: 10, bottom: 40, left: 10, right: 10 };
 
 function barChart(data, container, indicador, titulo) {
+  
+  d3.select(container).selectAll("*").remove();
+
   const svg = d3
     .select(container)
     .append("svg")
@@ -117,11 +141,11 @@ function barChart(data, container, indicador, titulo) {
     .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  // svg
-  //   .append("rect")
-  //   .attr("width", "100%")
-  //   .attr("height", "100%")
-  //   .attr("fill", "#3b3b3b"); // todo este codigo es para poner un fondo gris
+  svg
+    .append("rect")
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .attr("fill", "white"); // todo este codigo es para poner un fondo gris
 
   // Create a scale for the x-axis based on unique "anio" values
   const anios = Array.from(new Set(data.map((d) => d.anio)));
@@ -152,7 +176,7 @@ function barChart(data, container, indicador, titulo) {
     .attr("y", (d) => y(d[indicador]))
     .attr("width", x.bandwidth() / 2) // Reduce the width to create space between bars in the same group
     .attr("height", (d) => y(0) - y(d[indicador]))
-    .attr("fill", (d) => (d.poblacion === "indigena" ? "cornflowerblue" : "gray"));
+    .attr("fill", (d) => (d.poblacion === "indigena" ? colores_textos[indicador] : "gray"));
 
   function yAxis(g) {
     g.attr("transform", `translate(${margin.left}, 0)`)
@@ -176,15 +200,15 @@ function barChart(data, container, indicador, titulo) {
       .attr("font-size", "20px");
     g.select(".domain").attr("stroke", "black"); // Set axis line color to"black
 
-    // Add title
-    svg
-      .append("text")
-      .attr("class", "chart-title")
-      .attr("x", width / 2)
-      .attr("y", -margin.top / 2)
-      .attr("text-anchor", "middle")
-      .attr("fill", "black")
-      .text(titulo);
+    // // Add title
+    // svg
+    //   .append("text")
+    //   .attr("class", "chart-title")
+    //   .attr("x", width / 2)
+    //   .attr("y", -margin.top / 2)
+    //   .attr("text-anchor", "middle")
+    //   .attr("fill", "black")
+    //   .text(titulo);
 
     // Add x-axis label
     svg
@@ -213,10 +237,4 @@ function barChart(data, container, indicador, titulo) {
   svg.node();
 }
 
-barChart(
-  data,
-  "#d3-container1",
-  "rezago_educativo",
-  "Rezago educativo"
-);
-// barChart(servicio_salud, "#d3-container2", "Trabajo Infantil");
+barChart(data, "#d3-container1", indicador, texto);
