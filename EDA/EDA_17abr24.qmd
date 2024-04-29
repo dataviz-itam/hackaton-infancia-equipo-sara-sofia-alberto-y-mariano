@@ -1,0 +1,1226 @@
+---
+title: "EDA_17-abr-24"
+format: pdf
+editor: visual
+---
+
+# Primera Revisada de Datos
+
+## Previo
+
+### Bibliotecas
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(lubridate)
+library(janitor)
+library(ggplot2)
+```
+
+### Carga de Datos
+
+```{r}
+raw_data <- read.csv("../data/icm-00-23.csv")
+glimpse(raw_data)
+```
+
+# Revisión general
+
+## Revisamos años
+
+```{r}
+unique(raw_data$Año)
+```
+
+```{r}
+raw_data %>% filter(Año=="1.CIFRA SIN AÑO DE REFERENCIA")
+```
+
+Filtramos estos datos
+
+**Igual hay que preguntar que onda con estos datos**
+
+```{r}
+raw_data_1 <- raw_data %>% filter(Año!="1.CIFRA SIN AÑO DE REFERENCIA") %>% 
+  mutate(Año=as.integer(Año)) %>% 
+  arrange(Año)
+unique(raw_data_1$Año)
+```
+
+## Revisar Estados
+
+```{r}
+unique(raw_data_1$Entidad)
+```
+
+## Revisar Género
+
+```{r}
+unique(raw_data_1$Sexo)
+```
+
+### Revisamos viviendas
+
+Separar viviendas a otra tabla
+
+```{r}
+raw_viviendas <- raw_data_1 %>% filter(Sexo=="Viviendas particulares habitadas")
+raw_data_2 <- raw_data_1 %>% filter(Sexo!="Viviendas particulares habitadas")
+glimpse(raw_viviendas)
+unique(raw_viviendas$Año)          #  Sólo hay tres años
+unique(raw_viviendas$Entidad)      # Todos los estados y a nivel Nacional
+unique(raw_viviendas$Sexo)         # Quitar
+unique(raw_viviendas$Edad)         # Quitar
+unique(raw_viviendas$Tasa)         # Quitar
+unique(raw_viviendas$Población)    # Son 6 categorías
+```
+
+Revisamos cómo es el cálculo de porcentaje:
+
+```{r}
+raw_viviendas %>% select(Año, Entidad, Población, Cantidad, Totales, Porcentaje) %>% 
+  mutate(revision = round(Porcentaje - Cantidad/Totales,3)) %>% 
+  filter(revision!=0)
+```
+
+Revisamos el total de viviendas:
+
+```{r}
+raw_viviendas %>% filter(Entidad!="NACIONAL") %>% 
+  group_by(Población) %>% 
+  summarise(tot = sum(Totales))
+
+raw_viviendas %>% filter(Entidad=="NACIONAL") %>% 
+  group_by(Población) %>% 
+  summarise(tot = sum(Totales))
+```
+
+Revisamos los datos de Internet
+
+```{r}
+raw_viviendas %>% filter(Población=="No disponen de Internet")  %>% 
+  group_by(Año) %>% 
+  summarise(tot = sum(Totales))
+```
+
+No hay año 2000 en Internet
+
+Hacemos los cambios mencionados:
+
+```{r}
+raw_viviendas_1 <- raw_viviendas %>% select(Año, Entidad, Población, Cantidad, Totales) %>% 
+  mutate(Porcentaje = Cantidad/Totales)
+glimpse(raw_viviendas_1)
+```
+
+# Revisamos Población
+
+```{r}
+unique(raw_data_2$Población)
+```
+
+# Clasificación
+
+Vamos a ir filtrando por tema
+
+## Educación
+
+```{r}
+```
+
+```{r}
+raw_educacion <- raw_data_2 %>% filter(Población == "Población que no asiste a la escuela" | 
+                      Población == "Población indígena que no asiste a la escuela" | 
+                      Población == "Abandono escolar (primaria)" |
+                      Población == "Abandono escolar (secundaria)" |
+                      Población == "Inasistencia escolar" |
+                      Población == "Rezago educativo (hasta 2018)" |   
+                      Población == "Abandono escolar (media superior)" |
+                      Población == "Población con condición mental que no asiste a la escuela" |
+                      Población == "Rezago educativo (no indígena)" |
+                      Población == "Rezago educativo (indígena)" |
+                      Población == "Rezago educativo" |
+                      Población != "Población afrodescendiente que no asiste a la escuela"
+                      )
+
+raw_data_3 <- raw_data_2 %>% filter(Población != "Población que no asiste a la escuela" & 
+                      Población != "Población indígena que no asiste a la escuela" &
+                      Población != "Abandono escolar (primaria)" &
+                      Población != "Abandono escolar (secundaria)" &
+                      Población != "Inasistencia escolar" &
+                      Población != "Rezago educativo (hasta 2018)" &
+                      Población != "Abandono escolar (media superior)" &
+                      Población != "Población con condición mental que no asiste a la escuela" &
+                      Población != "Rezago educativo (no indígena)" &
+                      Población != "Rezago educativo (indígena)" &
+                      Población != "Rezago educativo" &
+                      Población != "Población afrodescendiente que no asiste a la escuela"  
+                      )
+```
+
+```{r}
+```
+
+## Salud
+
+**Acá también entra seguridad social??**
+
+```{r}
+raw_salud <- raw_data_3 %>% filter(Población == "Población sin afiliación a servicio de salud" | 
+                      Población == "Población indígena sin afiliación a servicio de salud" | 
+                      Población == "Carencia por acceso a servicios de salud (hasta 2018)" |
+                      Población == "Población con condición mental sin afiliación a servicio de salud" |
+                      Población == "Carencia por acceso a servicios de salud (no indígena)" |
+                      Población == "Carencia por acceso a servicios de salud (indígena)" |   
+                      Población == "Carencia por acceso a servicios de salud" |
+                      Población == "Población afrodescendiente sin afiliación a servicio de salud" |
+                      Población == "Carencia por acceso a la seguridad social (no indígena)" |
+                      Población == "Carencia por acceso a la seguridad social (indígena)" |
+                      Población == "Carencia por acceso a la seguridad social"
+                      )
+
+raw_data_4 <- raw_data_3 %>% filter(Población != "Población sin afiliación a servicio de salud" &
+                      Población != "Población indígena sin afiliación a servicio de salud" &
+                      Población != "Carencia por acceso a servicios de salud (hasta 2018)" &
+                      Población != "Población con condición mental sin afiliación a servicio de salud" &
+                      Población != "Carencia por acceso a servicios de salud (no indígena)" &
+                      Población != "Carencia por acceso a servicios de salud (indígena)" &
+                      Población != "Carencia por acceso a servicios de salud" &
+                      Población != "Población afrodescendiente sin afiliación a servicio de salud" &
+                      Población != "Carencia por acceso a la seguridad social (no indígena)" &
+                      Población != "Carencia por acceso a la seguridad social (indígena)" &
+                      Población != "Carencia por acceso a la seguridad social"
+                      )
+```
+
+## Vivienda
+
+```{r}
+raw_vivienda_2 <- raw_data_4 %>% filter(Población == "Carencia por calidad y espacios de la vivienda (hasta 2018)" | 
+                      Población == "Carencia por servicios básicos de la vivienda (hasta 2018)" | 
+                      Población == "Carencia por calidad y espacios de la vivienda (no indígena)" |
+                      Población == "Carencia por calidad y espacios de la vivienda (indígena)" |
+                      Población == "Carencia por servicios básicos de la vivienda (no indígena)" |
+                      Población == "Carencia por servicios básicos de la vivienda (indígena)" |   
+                      Población == "Carencia por calidad y espacios de la vivienda" |
+                      Población == "Carencia por servicios básicos de la vivienda"
+                      )
+
+raw_data_5 <- raw_data_4 %>% filter(Población != "Carencia por calidad y espacios de la vivienda (hasta 2018)" &
+                      Población != "Carencia por servicios básicos de la vivienda (hasta 2018)" &
+                      Población != "Carencia por calidad y espacios de la vivienda (no indígena)" &
+                      Población != "Carencia por calidad y espacios de la vivienda (indígena)" &
+                      Población != "Carencia por servicios básicos de la vivienda (no indígena)" &
+                      Población != "Carencia por servicios básicos de la vivienda (indígena)" &
+                      Población != "Carencia por calidad y espacios de la vivienda" &
+                      Población != "Carencia por servicios básicos de la vivienda"
+                      )
+```
+
+## Alimentación
+
+```{r}
+raw_alimentacion <- raw_data_5 %>% filter(Población == "Carencia por acceso a la alimentación (hasta 2018)" | 
+                      Población == "Inseguridad alimentaria" | 
+                      Población == "Carencia por acceso a la alimentación nutritiva y de calidad (no indígena)" |
+                      Población == "Carencia por acceso a la alimentación nutritiva y de calidad (indígena)" |
+                      Población == "Carencia por acceso a la alimentación nutritiva y de calidad" 
+                      )
+
+raw_data_6 <- raw_data_5 %>% filter(Población != "Carencia por acceso a la alimentación (hasta 2018)" &
+                      Población != "Inseguridad alimentaria" &
+                      Población != "Carencia por acceso a la alimentación nutritiva y de calidad (no indígena)" &
+                      Población != "Carencia por acceso a la alimentación nutritiva y de calidad (indígena)" &
+                      Población != "Carencia por acceso a la alimentación nutritiva y de calidad" 
+                      )
+
+```
+
+## Pobreza
+
+```{r}
+raw_pobreza <- raw_data_6 %>% filter(Población == "Población en pobreza (hasta 2018)" | 
+                      Población == "Población en pobreza extrema (hasta 2018)" | 
+                      Población == "Población no indígena en pobreza" |
+                      Población == "Población indígena en pobreza" |
+                      Población == "Población no indígena en pobreza extrema" |
+                      Población == "Población indígena en pobreza extrema" |
+                      Población == "Población en pobreza" |
+                      Población == "Población en pobreza extrema" 
+                      )
+
+raw_data_7 <- raw_data_6 %>% filter(Población != "Población en pobreza (hasta 2018)" &
+                      Población != "Población en pobreza extrema (hasta 2018)" &
+                      Población != "Población no indígena en pobreza" &
+                      Población != "Población indígena en pobreza" &
+                      Población != "Población no indígena en pobreza extrema" &
+                      Población != "Población indígena en pobreza extrema" &
+                      Población != "Población en pobreza" &
+                      Población != "Población en pobreza extrema" 
+                      )
+```
+
+## Violencia
+
+**Es correcto poner suicidio aquí??** **Desaparecidos y no localizados???**
+
+```{r}
+raw_violencia <- raw_data_7 %>% filter(Población == "Defunciones por agresiones" | 
+                      Población == "Tasa de mortalidad infantil" | 
+                      Población == "Víctimas de feminicidio" |
+                      Población == "Defunciones por suicidio" |
+                      Población == "Personas desaparecidas y no localizadas"
+                      )
+
+raw_data_8 <- raw_data_7 %>% filter(Población != "Defunciones por agresiones" &
+                      Población != "Tasa de mortalidad infantil" &
+                      Población != "Víctimas de feminicidio" &
+                      Población != "Defunciones por suicidio" &
+                      Población != "Personas desaparecidas y no localizadas"
+                      )
+```
+
+## Madres adolescentes o Matrimonio Infantil
+
+```{r}
+raw_m_infantil <- raw_data_8 %>% filter(Población == "Población casada o en unión libre" | 
+                      Población == "Nacimientos de madres" | 
+                      Población == "Población indígena casada o en unión libre" |
+                      Población == "Población con condición mental casada o en unión libre" |
+                      Población == "Población afrodescendiente casada o en unión libre" |
+                      Población == "Población con hijos" |
+                      Población == "Población indígena con hijos" |
+                      Población == "Población con condición mental con hijos" |
+                      Población == "Población afrodescendiente con hijos"
+                      )
+
+raw_data_9 <- raw_data_8 %>% filter(Población != "Población casada o en unión libre" &
+                      Población != "Nacimientos de madres" &
+                      Población != "Población indígena casada o en unión libre" &
+                      Población != "Población con condición mental casada o en unión libre" &
+                      Población != "Población afrodescendiente casada o en unión libre" &
+                      Población != "Población con hijos" &
+                      Población != "Población indígena con hijos" &
+                      Población != "Población con condición mental con hijos" &
+                      Población != "Población afrodescendiente con hijos"
+                      )
+```
+
+## Trabajo Infantil
+
+```{r}
+raw_trabajo <- raw_data_9 %>% filter(Población == "Población ocupada" | 
+                      Población == "Trabajo infantil" 
+                      )
+raw_data_10 <- raw_data_9 %>% filter(Población != "Población ocupada" &
+                      Población != "Trabajo infantil" 
+                      )
+```
+
+## Derecho a Nacionalidad
+
+```{r}
+raw_nacionalidad <- raw_data_10 %>% filter(Población == "Repatriaciones desde EUA" | 
+                      Población == "Población con registro" 
+                      )
+raw_data_11 <- raw_data_10 %>% filter(Población != "Repatriaciones desde EUA" &
+                      Población != "Población con registro" 
+                      )
+```
+
+## Interseccionalidad
+
+```{r}
+unique(raw_data_11$Población)
+```
+
+**Qué es "Índice de calidad de leyes" ???** **Como afecta "Población que nació fuera de la entidad"???**
+
+# Revisión de cifras
+
+## raw_viviendas_1
+
+```{r}
+unique(raw_viviendas_1$Población)
+
+ggplot(raw_viviendas_1, aes(x=Año, y = Porcentaje, colour = Entidad))  + 
+  geom_line() +
+  facet_wrap(~Población)
+                     
+```
+
+**Porqué bajan??**
+
+```{r}
+unique(raw_viviendas_1$Población)
+
+raw_viviendas_1 %>%
+  filter(Entidad != "NACIONAL") %>% 
+  ggplot(aes(x=Año, y = Cantidad, colour = Entidad))  + 
+  geom_line() +
+  facet_wrap(~Población)
+```
+
+## raw_vivienda_2
+
+```{r}
+glimpse(raw_vivienda_2)
+unique(raw_vivienda_2$Año)            # Del 2008-2022 de dos en dos
+unique(raw_vivienda_2$Entidad)        # Completo con Nacional
+unique(raw_vivienda_2$Edad)           # Intervalos de 3-17 y 0-17 años usarlos para comprobar cantidades
+#unique(raw_vivienda_2$Cantidad)       # Algunos NA, investigar donde no hay de: cantidad, totales y porcentaje
+```
+
+Vamos a ver dónde están los NA
+
+```{r}
+raw_vivienda_2 %>% filter(is.na(Cantidad)) %>% {unique(.$Población)}
+```
+
+**Estas cantidades son la suma hasta 2018?**
+
+Limpiamos la parte que no es hasta 2018:
+
+```{r}
+raw_vivienda_3 <- raw_vivienda_2 %>% filter(Población!="Carencia por calidad y espacios de la vivienda (hasta 2018)" &
+                          Población!="Carencia por servicios básicos de la vivienda (hasta 2018)") 
+glimpse(raw_vivienda_3)
+unique(raw_vivienda_3$Totales)  # Borrar
+unique(raw_vivienda_3$Tasa)     # Borrar 
+unique(raw_vivienda_3$Edad)     #Ojo solo de 3-17 y 0-17
+unique(raw_vivienda_3$Sexo)     # Hombre Mujer y Total
+unique(raw_vivienda_3$Entidad)  # Todos los estados y Nacional
+unique(raw_vivienda_3$Año)      # 2016, 2018, 2020, 2022
+
+raw_vivienda_4 <- raw_vivienda_3 %>% select(Año, Entidad, Población, Sexo, Edad, Cantidad, Porcentaje)
+```
+
+limpiamos la parte hasta 2018
+
+```{r}
+raw_vivienda_5 <- raw_vivienda_2 %>% filter(Población=="Carencia por calidad y espacios de la vivienda (hasta 2018)" |
+                          Población=="Carencia por servicios básicos de la vivienda (hasta 2018)") 
+glimpse(raw_vivienda_5)
+unique(raw_vivienda_5$Totales)      # Borrar
+unique(raw_vivienda_5$Tasa)         # Borrar
+unique(raw_vivienda_5$Cantidad)     # Borrar
+unique(raw_vivienda_5$Edad)         # "0 a 17 años"  "0 a 1 años"   "2 a 5 años"   "6 a 11 años"  "12 a 17 años"
+unique(raw_vivienda_5$Sexo)         # Hombre Mujer y Total
+unique(raw_vivienda_5$Entidad)      # Todos los estados y Nacional
+unique(raw_vivienda_5$Año)          # 2008 2010 2012 2014 2016 2018
+
+raw_vivienda_6 <- raw_vivienda_5 %>% select(Año, Entidad, Población, Sexo, Edad, Porcentaje)
+```
+
+Como se comparan estos dos?
+
+```{r}
+raw_vivienda_4 %>% filter(Año==2016 | Año==2018) %>% 
+  filter(Edad=="0 a 17 años") %>% 
+  group_by(Población) %>% 
+  summarise(sum_p=sum(Porcentaje))
+```
+
+```{r}
+raw_vivienda_6 %>% filter(Año==2016 | Año==2018) %>% 
+  filter(Edad=="0 a 17 años") %>% 
+  group_by(Población) %>% 
+  summarise(sum_p=sum(Porcentaje))
+```
+
+# Propuestas Sara
+
+## Matrimonio e Hijos
+
+```{r}
+unique(raw_data_2$Población)
+```
+
+```{r}
+datos_1 <-raw_data_2 %>% 
+  filter(
+          Población == "Población afrodescendiente"  | 
+          Población == "Población afrodescendiente que no asiste a la escuela"  | 
+          Población == "Población afrodescendiente con hijos" |
+          Población == "Población afrodescendiente sin afiliación a servicio de salud"  |
+          Población == "Población afrodescendiente casada o en unión libre" |
+          Población == "Población afrodescendiente con condición mental" |   
+                        
+          Población == "Población hablante de lengua indígena" |
+          Población == "Población indígena que no asiste a la escuela" |
+          Población == "Población indígena con hijos" |
+          Población == "Población indígena sin afiliación a servicio de salud" |
+          Población == "Población indígena casada o en unión libre" |
+          Población == "Población indígena con condición mental" |
+                      
+          Población == "Población con condición mental" |
+          Población == "Población con condición mental que no asiste a la escuela" |
+          Población == "Población con condición mental con hijos" |
+          Población == "Población con condición mental sin afiliación a servicio de salud" |
+          Población == "Población con condición mental casada o en unión libre"
+          ) %>% 
+  select(Año, Entidad, Población, Sexo, Edad, Cantidad, Totales, Porcentaje)
+
+
+datos_1 <- datos_1 %>% mutate(varios=paste(Población,Edad,Año)) %>% arrange(varios)
+
+unique(datos_1$varios)
+
+```
+
+```{r}
+raw_m_infantil <- raw_data_8 %>% filter(
+                      Población == "Población casada o en unión libre" | 
+                      Población == "Nacimientos de madres" | 
+                      Población == "Población indígena casada o en unión libre" |
+                      Población == "Población con condición mental casada o en unión libre" |
+                      Población == "Población afrodescendiente casada o en unión libre" |
+                      Población == "Población con hijos" |
+                      Población == "Población indígena con hijos" |
+                      Población == "Población con condición mental con hijos" |
+                      Población == "Población afrodescendiente con hijos"#|
+                      # Población == "Población afrodescendiente"  | 
+                      # Población == "Población hablante de lengua indígena" |
+                      # Población == "Población con condición mental" 
+                      )
+
+glimpse(raw_m_infantil)
+
+unique(raw_m_infantil$Tasa)  # Se borra tasa
+unique(raw_m_infantil$Edad)
+unique(raw_m_infantil$Poblacion)
+unique(raw_m_infantil$Año)
+
+raw_m_infantil <- raw_m_infantil %>% select(Año, Entidad, Población, Sexo, Edad, Cantidad, Totales, Porcentaje)
+
+# raw_m_infantil %>% filter(Población=="Población casada o en unión libre")
+
+```
+
+```{r}
+pob_casada <- raw_m_infantil %>% 
+  filter(Población=="Población casada o en unión libre") %>% 
+  filter(Sexo != "Total") %>% 
+  filter(Edad=="12 a 17 años") %>% 
+  filter(Entidad=="NACIONAL")
+
+pob_casada
+
+library(scales)
+
+# Define custom colors
+custom_fill_colors <- c("cornflowerblue", "magenta")
+custom_background_color <- "transparent"
+custom_text_color <- "lightgray"
+custom_axis_color <- "lightgray"
+patterns <- c("stripe", "solid")  # Add hash patterns for each color
+
+
+ggplot(pob_casada, aes(x = as.factor(Año), y = Cantidad, fill = Sexo)) +
+  geom_bar(position="dodge", stat="identity") +
+  scale_fill_manual(values = custom_fill_colors, aesthetics = "fill") +
+  ggtitle(str_wrap("Matrimonio infantil", width = 50)) +  # Center the title
+  theme(
+    plot.title = element_text(size = 14, color = "lightgray", hjust = 0.5),  # Set plot title color to lightgray
+    plot.background = element_rect(fill = "#555555"),  # Set plot background color to transparent
+    panel.background = element_rect(fill = "#555555"),  # Set panel background color to transparent
+    legend.background = element_rect(fill = "#555555"),  # Set legend background color to transparent
+    axis.text = element_text(color = "lightgray"),  # Set axis text color to lightgray
+    axis.title = element_text(color = "lightgray"),  # Set axis title color to lightgray
+    axis.line = element_line(color = "lightgray"),  # Set axis line color to lightgray
+    axis.ticks = element_line(color = "lightgray"),  # Set axis ticks color to lightgray
+    legend.text = element_text(color = "lightgray"),  # Set legend text color to lightgray
+    legend.title = element_text(color = "lightgray")  # Set legend title color to lightgray
+  )+
+  scale_y_continuous(labels = scales::comma) +  # Use comma formatting for y-axis labels
+  xlab("Año") +  # Add x-axis label
+  ylab("adolescentes de 12 a 17 años")  # Add y-axis label
+```
+
+```{r}
+# # Define custom colors for bars
+# custom_bar_colors <- c("white", "red")
+# 
+# # Plotting the data with custom bar colors and line type
+# ggplot(pob_casada, aes(x = as.factor(Año), y = Cantidad, color = Sexo)) +
+#   geom_bar(position = "dodge", stat = "identity", fill = "transparent", linetype = "dashed") +
+#   scale_color_manual(values = custom_bar_colors) +  # Set custom bar colors
+#   ggtitle(str_wrap("Comparación entre Hombres y Mujeres Adolescentes (12-17 Años), casados o en unión libre a nivel nacional", width = 50)) +
+#   theme(plot.title = element_text(size = 14, color = "lightgray"),  # Set plot title color
+#         plot.background = element_rect(fill = "black"),  # Set plot background color
+#         axis.text = element_text(color = "lightgray"),  # Set axis text color
+#         axis.title = element_text(color = "lightgray"),  # Set axis title color
+#         axis.line = element_line(color = "lightgray"),  # Set axis line color
+#         panel.background = element_rect(fill = "black"),  # Set panel background color
+#         panel.grid.major = element_blank(),  # Remove major gridlines
+#         panel.grid.minor = element_blank(),  # Remove minor gridlines
+#         legend.text = element_text(color = "lightgray"),  # Set legend text color
+#         legend.title = element_text(color = "lightgray"),  # Set legend title color
+#         legend.background = element_rect(fill = "black")) +  # Set legend background color
+#   scale_y_continuous(labels = scales::comma) +  # Use comma formatting for y-axis labels
+#   xlab("Año") +  # Add x-axis label
+#   ylab("Cantidad")  # Add y-axis label
+
+```
+
+
+```{r}
+raw_m_infantil %>%
+  filter(Población == "Población casada o en unión libre" |
+         Población == "Población afrodescendiente casada o en unión libre" |
+         Población == "Población indígena casada o en unión libre" |
+         Población == "Población con condición mental casada o en unión libre"
+  ) %>%
+  mutate(Población = ifelse(Población == "Población casada o en unión libre", "Población en general", Población)) %>%
+  mutate(Población = ifelse(Población == "Población afrodescendiente casada o en unión libre", "Afrodescendiente", Población)) %>%
+  mutate(Población = ifelse(Población == "Población indígena casada o en unión libre", "Indígena", Población)) %>%
+  mutate(Población = ifelse(Población == "Población con condición mental casada o en unión libre", "con condición mental", Población)) %>%
+  mutate(Porcentaje=Porcentaje*100) %>% 
+  filter(Sexo == "Total") %>%
+  filter(Año == 2020) %>%
+  filter(Entidad == "NACIONAL") %>%
+  filter(Edad == "12 a 17 años") %>% 
+  ggplot(aes(x = Población, y = Porcentaje, fill = Edad)) +
+  geom_bar(position="dodge", stat = "identity") +
+  ggtitle(str_wrap("Porcentaje de las adolescentes de poblaciones vulnerables que están casadas o en unión libre a nivel nacional (2020)", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma) 
+```
+
+
+```{r}
+raw_m_infantil %>%
+  filter(Población == "Población con hijos" |
+         Población == "Población afrodescendiente con hijos" |
+         Población == "Población indígena con hijos" |
+         Población == "Población con condición mental con hijos"
+  ) %>%
+  mutate(Población = ifelse(Población == "Población con hijos", "Población en general", Población)) %>%
+  mutate(Población = ifelse(Población == "Población afrodescendiente con hijos", "Afrodescendiente", Población)) %>%
+  mutate(Población = ifelse(Población == "Población indígena con hijos", "Indígena", Población)) %>%
+  mutate(Población = ifelse(Población == "Población con condición mental con hijos", "con condición mental", Población)) %>%
+  mutate(Porcentaje=Porcentaje*100) %>% 
+  filter(Sexo == "Mujer") %>% ###################################### OJO SOLO CUENTAN A LAS MUJERES
+  filter(Año == 2020) %>%
+  filter(Entidad == "NACIONAL") %>%
+  filter(Edad == "12 a 17 años") %>% 
+  ggplot(aes(x = Población, y = Porcentaje, fill = Edad)) +
+  geom_bar(stat = "identity") +
+  ggtitle(str_wrap("Porcentaje de mujeres adolescentes de poblaciones vulnerables que tienen hijos nivel nacional (2020)", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma) 
+```
+```{r}
+raw_m_infantil %>%
+  filter(Población == "Nacimientos de madres") %>% 
+  ggplot(aes(x = Año, y = Cantidad, fill = Edad)) +
+  geom_bar(stat = "identity") +
+  ggtitle(str_wrap("Cantidad de Nacimientos de madres???, por año", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)
+```
+
+
+## Escuela
+
+```{r}
+raw_data_2 %>% 
+  filter(
+          Población == "Población afrodescendiente que no asiste a la escuela"  | 
+          Población == "Población indígena que no asiste a la escuela" |
+          Población == "Población con condición mental que no asiste a la escuela" |
+          Población == "Población que no asiste a la escuela"
+          ) %>% 
+  mutate(Población = ifelse(Población == "Población afrodescendiente que no asiste a la escuela", "Afro", Población)) %>%
+    mutate(Población = ifelse(Población == "Población indígena que no asiste a la escuela", "Indgn", Población)) %>%
+    mutate(Población = ifelse(Población == "Población con condición mental que no asiste a la escuela", "cm", Población)) %>%
+    mutate(Población = ifelse(Población == "Población que no asiste a la escuela", "PG", Población)) %>%
+    mutate(Porcentaje=Porcentaje*100) %>% 
+  filter(Sexo!="Total") %>% 
+  filter(Entidad=="NACIONAL") %>% 
+  ggplot(aes(fill=Edad, y=Porcentaje, x=Población)) + 
+    geom_bar(position="dodge", stat="identity")+
+  facet_wrap(~Año)+
+  ggtitle(str_wrap("Porcentaje niños y adolescentes (afrodescendientes, con condición mental, indígenas y población en general), que no asiste a la escuela", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)
+```
+
+**Aquí me molesta que no haya esta estadística para discapacidad**
+**Hay otras categorias de abandono escolar**
+
+```{r}
+abandono_escolar <- raw_data_2 %>% 
+  filter(
+          Población == "Abandono escolar (primaria)"  | 
+          Población == "Abandono escolar (secundaria)" |
+          Población == "Abandono escolar (media superior)"
+          ) 
+
+unique(abandono_escolar$Año)
+unique(abandono_escolar$Población)
+unique(abandono_escolar$Sexo)
+unique(abandono_escolar$Edad)
+unique(abandono_escolar$Cantidad)
+unique(abandono_escolar$Totales)
+unique(abandono_escolar$Porcentaje)
+```
+
+```{r}
+abandono_escolar %>% 
+  select(Año, Población, Sexo, Tasa) %>% 
+  filter(Sexo != "Total") %>% 
+  ggplot(aes(fill=Sexo, y=Tasa, x=Año)) + 
+    geom_bar(position="dodge", stat="identity")+
+  facet_wrap(~Población)+
+  ggtitle(str_wrap("Tasa de abandono escolar (primaria, secundaria, media superior, por año por sexo)", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)
+```
+
+
+
+
+```{r}
+raw_data_2 %>% 
+  filter(
+          Población == "Inasistencia escolar"  
+          ) %>% 
+  filter(Sexo!="Total") %>% 
+  filter(Entidad=="NACIONAL") %>% 
+  ggplot(aes(fill=Sexo, y=Porcentaje, x=Año)) + 
+    geom_bar(position="dodge", stat="identity")+
+  facet_wrap(~Edad)+
+  ggtitle(str_wrap("Inasistencia escolar", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)
+```
+
+```{r}
+raw_data_2 %>% 
+  filter(
+          Población == "Rezago educativo (hasta 2018)" 
+          ) %>% 
+  filter(Sexo!="Total") %>% 
+  filter(Entidad=="NACIONAL") %>% 
+  ggplot(aes(fill=Sexo, y=Porcentaje, x=Año)) + 
+    geom_bar(position="dodge", stat="identity")+
+  facet_wrap(~Edad)+
+  ggtitle(str_wrap("Rezago educativo (hasta 2018)", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)
+```
+
+
+
+```{r}
+raw_data_2 %>% 
+  filter(
+          Población == "Rezago educativo (no indígena)" |
+          Población == "Rezago educativo (indígena)"
+          ) %>% 
+  ggplot(aes(x = Año, y = Porcentaje, fill = Población)) +    #Cantidad o Porcentaje
+  geom_bar(stat = "identity") +
+  ggtitle(str_wrap("Rezago educativo de 3 a 17 años a nivel nacional (Porcentaje)", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)
+  
+  #3 a 17, nacional, total, cantidad o porcentaje
+```
+
+
+## Servicio de Salud
+
+```{r}
+raw_data_2 %>% 
+  filter(
+          Población == "Población afrodescendiente sin afiliación a servicio de salud"  | 
+          Población == "Población indígena sin afiliación a servicio de salud" |
+          Población == "Población con condición mental sin afiliación a servicio de salud" |
+          Población == "Población sin afiliación a servicio de salud"
+          ) %>% 
+  mutate(Población = ifelse(Población == "Población afrodescendiente sin afiliación a servicio de salud", "Afro", Población)) %>%
+    mutate(Población = ifelse(Población == "Población indígena sin afiliación a servicio de salud", "Indgn", Población)) %>%
+    mutate(Población = ifelse(Población == "Población con condición mental sin afiliación a servicio de salud", "cm", Población)) %>%
+    mutate(Población = ifelse(Población == "Población sin afiliación a servicio de salud", "PG", Población)) %>%
+    mutate(Porcentaje=Porcentaje*100) %>% 
+  filter(Sexo!="Total") %>% 
+  filter(Entidad=="NACIONAL") %>% 
+  ggplot(aes(fill=Edad, y=Porcentaje, x=Población)) + 
+    geom_bar(position="dodge", stat="identity")+
+  facet_wrap(~Año)+
+  ggtitle(str_wrap("Porcentaje niños y adolescentes (afrodescendientes, con condición mental, indígenas y población en general), sin afiliación al servicio de salud", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)
+```
+
+**Hay otras categorias de carencia de servicios de salud y seguridad social**
+
+```{r}
+raw_data_2 %>% 
+  filter(
+          Población == "Carencia por acceso a servicios de salud (hasta 2018)"
+          ) %>% 
+  filter(Entidad=="NACIONAL") %>% 
+  filter(Sexo!="Total") %>% 
+  ggplot(aes(x = Año, y = Porcentaje, fill = Sexo)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  ggtitle(str_wrap("Carencia por acceso a servicios de salud hasta 2018", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)+
+  facet_wrap(~Edad)
+```
+
+```{r}
+raw_data_2 %>% 
+  filter(
+          Población == "Carencia por acceso a servicios de salud"
+          ) %>% 
+  filter(Entidad=="NACIONAL") %>% 
+  filter(Sexo!="Total") %>% 
+  ggplot(aes(x = Año, y = Porcentaje, fill = Sexo)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  ggtitle(str_wrap("Carencia por acceso a servicios de salud 0-17 años (Porcentaje)", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)
+```
+
+```{r}
+raw_data_2 %>% 
+  filter(
+          Población == "Carencia por acceso a la seguridad social"
+          ) %>% 
+  filter(Entidad=="NACIONAL") %>% 
+  filter(Sexo!="Total") %>% 
+  ggplot(aes(x = Año, y = Porcentaje, fill = Sexo)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  ggtitle(str_wrap("Carencia por acceso a la seguridad social 0-17 años (Porcentaje)", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)
+```
+
+
+
+
+```{r}
+raw_data_2 %>% 
+  filter(
+          Población == "Carencia por acceso a servicios de salud (no indígena)" |
+          Población == "Carencia por acceso a servicios de salud (indígena)" 
+          ) %>% 
+  ggplot(aes(x = Año, y = Porcentaje, fill = Población)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  ggtitle(str_wrap("Carencia por acceso a servicios de salud", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)
+```
+
+```{r}
+raw_data_2 %>% 
+  filter(
+          Población == "Carencia por acceso a la seguridad social (no indígena)" |
+          Población == "Carencia por acceso a la seguridad social (indígena)"
+          ) %>% 
+  ggplot(aes(x = Año, y = Porcentaje, fill = Población)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  ggtitle(str_wrap("Carencia por acceso a la seguridad social", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)
+```
+
+
+## Alimentación
+
+```{r}
+glimpse(raw_alimentacion)
+# unique(raw_alimentacion$Cantidad)
+unique(raw_alimentacion$Totales) # Se quita
+unique(raw_alimentacion$Tasa)    # Se quita
+unique(raw_alimentacion$Edad)
+unique(raw_alimentacion$Población)
+```
+
+```{r}
+raw_alimentacion %>% 
+  filter(
+    Población == "Carencia por acceso a la alimentación nutritiva y de calidad (no indígena)" |
+    Población == "Carencia por acceso a la alimentación nutritiva y de calidad (indígena)"
+  ) %>% 
+  ggplot(aes(x = Año, y = Porcentaje, fill = Población)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  ggtitle(str_wrap("Carencia por acceso a la alimentación nutritiva y de calidad", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)
+```
+
+```{r}
+raw_data_2 %>% 
+  filter(
+          Población == "Carencia por acceso a la alimentación (hasta 2018)"
+          ) %>% 
+  filter(Entidad=="NACIONAL") %>% 
+  filter(Sexo!="Total") %>% 
+  ggplot(aes(x = Año, y = Porcentaje, fill = Sexo)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  ggtitle(str_wrap("Carencia por acceso a la alimentación 2018", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)+
+  facet_wrap(~Edad)
+```
+
+```{r}
+raw_data_2 %>% 
+  filter(
+          Población == "Carencia por acceso a la alimentación nutritiva y de calidad"
+          ) %>% 
+  filter(Entidad=="NACIONAL") %>% 
+  filter(Sexo!="Total") %>% 
+  ggplot(aes(x = Año, y = Porcentaje, fill = Sexo)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  ggtitle(str_wrap("Carencia por acceso a la alimentación nutritiva y de calidad 0-17 años (Porcentaje)", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)
+```
+
+
+```{r}
+raw_alimentacion %>% 
+  filter(
+    Población == "Inseguridad alimentaria"
+  ) %>% 
+  filter(Entidad=="NACIONAL")%>% 
+  filter(Sexo!="Total") %>% 
+  ggplot(aes(x = Año, y = Porcentaje, fill = Sexo)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  ggtitle(str_wrap("Inseguridad alimentaria", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)+
+  facet_wrap(~Edad)
+```
+
+# Pobreza
+
+```{r}
+glimpse(raw_pobreza)
+unique(raw_pobreza$Tasa)
+unique(raw_pobreza$Totales)
+unique(raw_pobreza$Población)
+```
+
+```{r}
+raw_pobreza %>% 
+  filter(
+    Población == "Población no indígena en pobreza" |
+    Población == "Población indígena en pobreza"
+  ) %>% 
+  ggplot(aes(x = Año, y = Porcentaje, fill = Población)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  ggtitle(str_wrap("Población en pobreza", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)
+```
+
+```{r}
+raw_pobreza %>% 
+  filter(
+    Población == "Población no indígena en pobreza extrema" |
+    Población == "Población indígena en pobreza extrema"
+  ) %>% 
+  ggplot(aes(x = as.factor(Año), y = Porcentaje, fill = Población)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  ggtitle(str_wrap("Población en pobreza extrema", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)
+```
+```{r}
+raw_pobreza %>% 
+  filter(
+          Población == "Población en pobreza (hasta 2018)"
+          ) %>% 
+  filter(Entidad=="NACIONAL") %>% 
+  filter(Sexo!="Total") %>% 
+  ggplot(aes(x = Año, y = Porcentaje, fill = Sexo)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  ggtitle(str_wrap("Carencia por acceso a la alimentación 2018", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma)+
+  facet_wrap(~Edad)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+desaparecidos <- raw_data_2 %>% 
+  filter(
+          Población == "Personas desaparecidas y no localizadas"
+          ) %>% filter(Entidad=="NACIONAL")
+glimpse(desaparecidos)
+unique(desaparecidos$Año)
+unique(desaparecidos$Entidad)
+unique(desaparecidos$Sexo)
+unique(desaparecidos$Edad)
+
+unique(desaparecidos$Totales)
+unique(desaparecidos$Tasa)
+unique(desaparecidos$Porcentaje)
+```
+
+
+```{r}
+glimpse(raw_trabajo)
+unique(raw_trabajo$Tasa)
+unique(raw_trabajo$Población)
+unique(raw_trabajo$Año)
+
+```
+
+```{r}
+# Define custom fill colors
+custom_fill_colors <- c("cornflowerblue", "magenta")
+
+raw_trabajo %>% 
+  filter(
+    Población == "Trabajo infantil"
+  ) %>% 
+  filter(Entidad=="NACIONAL") %>% 
+  filter(Sexo!="Total") %>% 
+  filter(Edad=="15 a 17 años") %>% 
+  ggplot(aes(x = as.factor(Año), y = Cantidad, fill = Sexo)) +
+  geom_bar(position="dodge", stat="identity") +
+  scale_fill_manual(values = custom_fill_colors, aesthetics = "fill") +
+  ggtitle(str_wrap("Trabajo infantil", width = 50)) +  # Center the title
+  theme(
+    plot.title = element_text(size = 14, color = "lightgray", hjust = 0.5),  # Set plot title color to lightgray
+    plot.background = element_rect(fill = "#555555"),  # Set plot background color to transparent
+    panel.background = element_rect(fill = "#555555"),  # Set panel background color to transparent
+    legend.background = element_rect(fill = "#555555"),  # Set legend background color to transparent
+    axis.text = element_text(color = "lightgray"),  # Set axis text color to lightgray
+    axis.title = element_text(color = "lightgray"),  # Set axis title color to lightgray
+    axis.line = element_line(color = "lightgray"),  # Set axis line color to lightgray
+    axis.ticks = element_line(color = "lightgray"),  # Set axis ticks color to lightgray
+    legend.text = element_text(color = "lightgray"),  # Set legend text color to lightgray
+    legend.title = element_text(color = "lightgray")  # Set legend title color to lightgray
+  ) +
+  scale_y_continuous(labels = scales::comma) +
+  xlab("Año") +
+  ylab("adolescentes de 15 a 17 años")
+
+```
+
+
+
+# Para Indígena y no indígena
+
+```{r}
+raw_data_2 %>% 
+  filter(
+          Población == "Rezago educativo (no indígena)" |
+          Población == "Rezago educativo (indígena)"
+          ) %>% 
+  mutate(Población = ifelse(Población == "Rezago educativo (no indígena)", "no indígena", Población)) %>%
+  mutate(Población = ifelse(Población == "Rezago educativo (indígena)", "indígena", Población)) %>%
+  mutate(Porcentaje=100*Porcentaje) %>% 
+  ggplot(aes(x = as.factor(Año), y = Porcentaje, fill = Población)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  scale_fill_manual(values = c("#00B8B2", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Rezago educativo de 3 a 17 años a nivel nacional (Porcentaje)", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma) +
+  xlab("Año") +
+  ylab("Porcentaje (%)")
+
+```
+
+```{r}
+raw_data_2 %>% 
+  filter(
+          Población == "Carencia por acceso a servicios de salud (no indígena)" |
+          Población == "Carencia por acceso a servicios de salud (indígena)" 
+          ) %>% 
+  mutate(Población = ifelse(Población == "Carencia por acceso a servicios de salud (no indígena)", "no indígena", Población)) %>%
+  mutate(Población = ifelse(Población == "Carencia por acceso a servicios de salud (indígena)", "indígena", Población)) %>%
+  mutate(Porcentaje=100*Porcentaje) %>% 
+  ggplot(aes(x = as.factor(Año), y = Porcentaje, fill = Población)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  scale_fill_manual(values = c("#FFC300", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Carencia por acceso a servicios de salud 3 a 17 años a nivel nacional (Porcentaje)", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma) +
+  xlab("Año") +
+  ylab("Porcentaje (%)")
+```
+
+```{r}
+raw_data_2 %>% 
+  filter(
+          Población == "Carencia por acceso a la seguridad social (no indígena)" |
+          Población == "Carencia por acceso a la seguridad social (indígena)"
+          ) %>% 
+  mutate(Población = ifelse(Población == "Carencia por acceso a la seguridad social (no indígena)", "no indígena", Población)) %>%
+  mutate(Población = ifelse(Población == "Carencia por acceso a la seguridad social (indígena)", "indígena", Población)) %>%
+  mutate(Porcentaje=100*Porcentaje) %>% 
+  ggplot(aes(x = as.factor(Año), y = Porcentaje, fill = Población)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  scale_fill_manual(values = c("#C77CFF", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Carencia por acceso a la seguridad social de 3 a 17 años a nivel nacional (Porcentaje)", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma) +
+  xlab("Año") +
+  ylab("Porcentaje (%)")
+```
+
+
+```{r}
+raw_alimentacion %>% 
+  filter(
+    Población == "Carencia por acceso a la alimentación nutritiva y de calidad (no indígena)" |
+    Población == "Carencia por acceso a la alimentación nutritiva y de calidad (indígena)"
+  )  %>% 
+  mutate(Población = ifelse(Población == "Carencia por acceso a la alimentación nutritiva y de calidad (no indígena)", "no indígena", Población)) %>%
+  mutate(Población = ifelse(Población == "Carencia por acceso a la alimentación nutritiva y de calidad (indígena)", "indígena", Población)) %>%
+  mutate(Porcentaje=100*Porcentaje) %>% 
+  ggplot(aes(x = as.factor(Año), y = Porcentaje, fill = Población)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Carencia por acceso a la alimentación nutritiva y de calidad de 3 a 17 años a nivel nacional (Porcentaje)", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma) +
+  xlab("Año") +
+  ylab("Porcentaje (%)")
+```
+
+
+
+```{r}
+raw_pobreza %>% 
+  filter(
+    Población == "Población no indígena en pobreza" |
+    Población == "Población indígena en pobreza"
+  ) %>% 
+  mutate(Población = ifelse(Población == "Población no indígena en pobreza", "no indígena", Población)) %>%
+  mutate(Población = ifelse(Población == "Población indígena en pobreza", "indígena", Población)) %>%
+  mutate(Porcentaje=100*Porcentaje) %>% 
+  ggplot(aes(x = as.factor(Año), y = Porcentaje, fill = Población)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  scale_fill_manual(values = c("#0CB702", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Población en pobreza de 3 a 17 años a nivel nacional (Porcentaje)", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma) +
+  xlab("Año") +
+  ylab("Porcentaje (%)")
+```
+
+```{r}
+raw_pobreza %>% 
+  filter(
+    Población == "Población no indígena en pobreza extrema" |
+    Población == "Población indígena en pobreza extrema"
+  ) %>% 
+  mutate(Población = ifelse(Población == "Población no indígena en pobreza extrema", "no indígena", Población)) %>%
+  mutate(Población = ifelse(Población == "Población indígena en pobreza extrema", "indígena", Población)) %>%
+  mutate(Porcentaje=100*Porcentaje) %>% 
+  ggplot(aes(x = as.factor(Año), y = Porcentaje, fill = Población)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  scale_fill_manual(values = c("#f37735", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Población en pobreza extrema de 3 a 17 años a nivel nacional (Porcentaje)", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma) +
+  xlab("Año") +
+  ylab("Porcentaje (%)")
+```
+
+```{r}
+raw_vivienda_2 %>% 
+  filter(
+    Población == "Carencia por calidad y espacios de la vivienda (no indígena)" |
+    Población == "Carencia por calidad y espacios de la vivienda (indígena)"
+  )  %>% 
+  mutate(Población = ifelse(Población == "Carencia por calidad y espacios de la vivienda (no indígena)", "no indígena", Población)) %>%
+  mutate(Población = ifelse(Población == "Carencia por calidad y espacios de la vivienda (indígena)", "indígena", Población)) %>%
+  mutate(Porcentaje=100*Porcentaje) %>% 
+  ggplot(aes(x = as.factor(Año), y = Porcentaje, fill = Población)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  scale_fill_manual(values = c("#ff61cc", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Carencia por calidad y espacios de la vivienda  de 3 a 17 años a nivel nacional (Porcentaje)", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma) +
+  xlab("Año") +
+  ylab("Porcentaje (%)")
+```
+
+```{r}
+raw_vivienda_2 %>% 
+  filter(
+    Población == "Carencia por servicios básicos de la vivienda (no indígena)" |
+    Población == "Carencia por servicios básicos de la vivienda (indígena)"
+  ) %>% 
+  mutate(Población = ifelse(Población == "Carencia por servicios básicos de la vivienda (no indígena)", "no indígena", Población)) %>%
+  mutate(Población = ifelse(Población == "Carencia por servicios básicos de la vivienda (indígena)", "indígena", Población)) %>%
+  mutate(Porcentaje=100*Porcentaje) %>% 
+  ggplot(aes(x = as.factor(Año), y = Porcentaje, fill = Población)) +    #Cantidad o Porcentaje
+  geom_bar(position="dodge", stat="identity") +
+  scale_fill_manual(values = c("#0000FF", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Carencia por servicios básicos de la vivienda  de 3 a 17 años a nivel nacional (Porcentaje)", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  scale_y_continuous(labels = comma) +
+  xlab("Año") +
+  ylab("Porcentaje (%)")
+```
+
+
+
