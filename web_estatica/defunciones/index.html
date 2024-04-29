@@ -9,6 +9,22 @@
     
 </head>
 <body>
+    <div class="overlay" id="overlay">
+        <span class="closeModal" id="close">&times;</span>
+        <p>Este es un gráfico con contenido delicado, en él encontrarás información sobre niños y niñas fallecidos por cada estado de la República Mexicana.</p>             
+        <p>Puedes elegir graficar entre 2 causas distintas de defunciones: defunción porsuicidio y defunción por agresión</p>
+        <p>Mediante el control deslizante puedes modificar el año que estas observando. </p>
+        <p>Las burbujas que verás, cambian de tamaño según el número de niñas (en color rosa) o niños (en color azul) para cada estado</p>
+        <p>Finalmente, queremos darte el siguiente mensaje: 
+            <ul>
+                <li>si alguna vez te sientes triste, no dudes en expresarlo y expresarlo a una persona de confianza, como familiares, amigos o maestros. </li>
+                <li>si alguna vez sientes que estás en peligro, no dudes en pedir ayuda. No estás solo.</li>
+            </p>
+        <p><button class="closeModal" id="closeIntButton">Ver gráfico</button></p>
+  </div>
+  <div>
+    <button id="openModal">Ver descripción</button>
+  </div>
     <div class="container">
         <h1 id="mapTitle">Defunciones por año</h1>
         <p id="mapDesc" style="display: none;">Datos recabados por la CONAFOR a partir de 2015 a 2021. El tamaño de las burbujas representa el total de hectareas afectadas; se tiene un rango de afectación general de <span id="minRange">0.005</span> a <span id="maxRange">23,809</span> hectareas</p>

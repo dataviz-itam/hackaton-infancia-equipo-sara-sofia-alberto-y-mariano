@@ -8,12 +8,23 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
+    <div class="overlay" id="overlay">
+          <span class="closeModal" id="close">&times;</span>
+          <p>En esta sección, encontrarás un mapa interactivo que muestra cuántos niños y niñas habitan en cada estado de la República Mexicana. </p>
+          <p>Puedes elegir graficar entre 3 poblaciones: población en general, población afrodescendiente y población indígena. </p>
+          <p>Mediante el control deslizante puedes modificar el año que se está observando. </p>
+          <p>Las burbujas que verás, cambian de tamaño según el número de niñas (en color rosa) o niños (en color azul) para cada estado</p>
+          <p><button class="closeModal" id="closeIntButton">Ver mapa</button></p>
+    </div>
+    <div>
+      <button id="openModal">Ver descripción</button>
+    </div>
     <div class="container">
         <h1 id="mapTitle">Población de niños y niñas en México</h1>
         <p id="mapDesc" style="display: none;">Datos recabados por la CONAFOR a partir de 2015 a 2021. El tamaño de las burbujas representa el total de hectareas afectadas; se tiene un rango de afectación general de <span id="minRange">0.005</span> a <span id="maxRange">23,809</span> hectareas</p>
-        <canvas id="myCanvas" style=" position: absolute; bottom: 40px; left: -60px;"></canvas>
+        <canvas id="myCanvas" style=" position: absolute; bottom: -10px; left: -60px;"></canvas>
         <canvas id="canvasRef" style=" position: absolute; bottom: -210px; left: 290px;"></canvas>
-        <canvas id="canvasRep" style=" position: absolute; bottom: -10px; left: 250px;"></canvas>
+        <canvas id="canvasRep" style=" position: absolute; bottom: -70px; left: 250px;"></canvas>
     </div>
     <div class="nav">
       <!--<a class="navLink" href="/"> Ver datos</a>-->
@@ -35,7 +46,7 @@
       <input type="radio" class="Impactcheck" id="indigena" name="categoria" value="indigena">
       <label for="indigena">indigena</label><br>
     </div>
-    <div class="collapsible" style="top: 400px; left: 35px;">
+    <div class="collapsible" style="top: 400px; left: -90px;">
         <div class="collapsible-header">
           <span>Marco de Referencia</span>
           <img src="resources/img/arrow.png" class="arrow-icon">

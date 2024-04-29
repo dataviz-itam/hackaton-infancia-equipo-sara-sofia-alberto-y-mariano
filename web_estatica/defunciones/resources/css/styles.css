@@ -6,6 +6,59 @@ body {
     background-color: rgb(17, 17, 17);
 }
 
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 70%;
+    height: 50%;
+    background-color: rgba(19, 62, 78, 0.9);
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    margin-left: 5%;
+    margin-top: 5%;
+    border-radius : 20px;
+    padding: 10%;
+    padding-top: 8% ;
+    color:white;
+    font-size: x-large;
+    transition: opacity 2.5s ease; 
+}
+
+#close {
+    color: white;
+    position: absolute;
+    top: 10px;
+    right: 30px;
+    font-size: 60px;
+    cursor: pointer;
+}
+
+#closeIntButton{
+    color: white;
+    font-size: x-large;
+    border-radius: 15px;
+    background-color: rgb(37, 36, 34,0.7);
+    margin-left: 45%;
+    margin-top: 5%;
+    padding: 2%;
+}
+
+#openModal{
+    color: white;
+    border-radius: 15px;
+    background-color: rgba(136, 39, 160, 0.7);
+    padding: 0.5%;
+    position: absolute;
+    top: 28px;
+    left: 40px;
+    z-index: 100;
+    display: none;
+}
+
+
 canvas {
     display: block;
 }
